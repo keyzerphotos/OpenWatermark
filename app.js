@@ -531,4 +531,357 @@
     img.onload = () => {
       logoImage = img;
       if (logoThumb) logoThumb.src = stored.dataUrl;
-    
+      if (logoName) logoName.textContent = stored.name;
+      if (logoInfoRow) logoInfoRow.style.display = 'block';
+      if (logoZone) logoZone.style.display = 'none';
+      updateFlow();
+      if (photos.length > 0 && hasWatermark()) generatePreview();
+    };
+    img.onerror = () => { clearLogoData(); };
+    img.src = stored.dataUrl;
+  }
+
+  function bindSlider(el, valEl, suffix) {
+    if (!el || !valEl) return;
+
+    el.addEventListener('input', () => {
+      valEl.textContent = el.value + suffix;
+      if (photos.length > 0 && hasWatermark()) debouncePreview();
+    });
+
+    const resetToDefault = () => {
+      const def = el.getAttribute('data-default');
+      if (def === null) return;
+      el.value = def;
+      valEl.textContent = def + suffix;
+      if (photos.length > 0 && hasWatermark()) debouncePreview();
+    };
+
+    el.addEventListener('dblclick', resetToDefault);
+
+    let lastTap = 0;
+    el.addEventListener('touchend', (e) => {
+      const now = Date.now();
+      if (now - lastTap < 350) {
+        e.preventDefault();
+        resetToDefault();
+      }
+      lastTap = now;
+    });
+  }
+
+  bindSlider(logoSize, logoSizeVal, '%');
+  bindSlider(opacity, opacityVal, '%');
+  bindSlider(rotation, rotationVal, '\u00B0');
+  bindSlider(spacing, spacingVal, '');
+
+  let previewTimer = null;
+  function debouncePreview() {
+    if (previewTimer) clearTimeout(previewTimer);
+    previewTimer = setTimeout(generatePreview, 150);
+  }
+
+  function loadImage(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image load failed')); };
+      img.src = url;
+    });
+  }
+
+  function loadImageFromBlob(blob) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(blob);
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Blob load failed')); };
+      img.src = url;
+    });
+  }
+
+  function createTextWatermarkImage(text, color, fontSize) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const font = 'bold ' + fontSize + 'px -apple-system, BlinkMacSystemFont, sans-serif';
+
+    ctx.font = font;
+    const metrics = ctx.measureText(text);
+    const width = Math.ceil(metrics.width) + 20;
+    const height = Math.ceil(fontSize * 1.4);
+
+    canvas.width = width;
+    canvas.height = height;
+    const ctx2 = canvas.getContext('2d');
+    ctx2.font = font;
+    ctx2.fillStyle = color === 'black' ? '#000000' : '#ffffff';
+    ctx2.textBaseline = 'middle';
+    ctx2.fillText(text, 10, height / 2);
+
+    return canvas;
+  }
+
+  async function applyWatermark(baseImg) {
+    const preset = PRESETS[currentPreset];
+
+    let outW = baseImg.width;
+    let outH = baseImg.height;
+    if (preset.maxSide !== Infinity) {
+      const longest = Math.max(outW, outH);
+      if (longest > preset.maxSide) {
+        const scale = preset.maxSide / longest;
+        outW = Math.round(outW * scale);
+        outH = Math.round(outH * scale);
+      }
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = outW;
+    canvas.height = outH;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(baseImg, 0, 0, outW, outH);
+
+    let wmSource;
+    if (wmMode === 'logo' && logoImage) {
+      wmSource = logoImage;
+    } else {
+      const baseDim = Math.min(outW, outH);
+      const fontSize = Math.max(20, Math.round(baseDim * 0.05));
+      wmSource = createTextWatermarkImage(wmText.value.trim() || 'OpenWatermark', textColor, fontSize);
+    }
+
+    const wmRatio = wmSource.height / wmSource.width;
+    const logoW = (outW * parseInt(logoSize.value, 10)) / 100;
+    const logoH = logoW * wmRatio;
+    const gap = parseInt(spacing.value, 10);
+    const rot = (parseInt(rotation.value, 10) * Math.PI) / 180;
+    const cellW = logoW + gap;
+    const cellH = logoH + gap;
+    const margin = Math.max(logoW, logoH);
+
+    ctx.globalAlpha = parseInt(opacity.value, 10) / 100;
+
+    for (let y = -margin; y < outH + margin; y += cellH) {
+      for (let x = -margin; x < outW + margin; x += cellW) {
+        ctx.save();
+        ctx.translate(x + logoW / 2, y + logoH / 2);
+        ctx.rotate(rot);
+        ctx.drawImage(wmSource, -logoW / 2, -logoH / 2, logoW, logoH);
+        ctx.restore();
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    const visibleBlob = await new Promise((resolve) =>
+      canvas.toBlob(resolve, 'image/jpeg', 0.95)
+    );
+
+    const payload = (payloadInput && payloadInput.value ? payloadInput.value : 'OpenWatermark-standaard').trim();
+
+    if (window.OpenWatermarkInvisible && payload) {
+      try {
+        const visibleImg = await loadImageFromBlob(visibleBlob);
+        return await window.OpenWatermarkInvisible.embed(visibleImg, payload);
+      } catch (err) {
+        console.warn('Onzichtbaar watermerk overgeslagen:', err.message);
+        return visibleBlob;
+      }
+    }
+    return visibleBlob;
+  }
+
+  function revokePreviewUrl() {
+    if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
+  }
+
+  async function generatePreview() {
+    if (!hasWatermark() || photos.length === 0) return;
+    try {
+      const img = await loadImage(photos[0].file);
+      const blob = await applyWatermark(img);
+      revokePreviewUrl();
+      previewUrl = URL.createObjectURL(blob);
+      if (preview) {
+        preview.src = previewUrl;
+        preview.style.display = 'block';
+      }
+      if (previewEmpty) previewEmpty.classList.add('hidden');
+    } catch (err) {
+      setStatus(t('preview_error') + err.message, 'error');
+    }
+  }
+
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', async () => {
+      if (busy) return;
+      if (!hasWatermark() || photos.length === 0) return;
+
+      busy = true;
+      updateFlow();
+      if (progressBar) progressBar.classList.add('visible');
+      if (progressFill) progressFill.style.width = '0%';
+
+      try {
+        const suffix = (suffixInput && suffixInput.value !== null) ? suffixInput.value : '_OpenWatermark';
+        const results = [];
+        for (let i = 0; i < photos.length; i++) {
+          setStatus(t('processing_one', i + 1, photos.length));
+          const p = photos[i];
+          const img = await loadImage(p.file);
+          const blob = await applyWatermark(img);
+          const baseName = p.file.name.replace(/\.[^.]+$/, '') || `foto_${i + 1}`;
+          results.push({ name: `${baseName}${suffix}.jpg`, blob });
+          if (progressFill) progressFill.style.width = `${((i + 1) / photos.length) * 100}%`;
+          await new Promise(r => setTimeout(r, 0));
+        }
+
+        if (results.length === 1) {
+          const url = URL.createObjectURL(results[0].blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = results[0].name;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 60000);
+          setStatus(t('done_single'), 'success');
+        } else {
+          if (typeof JSZip === 'undefined') {
+            setStatus(t('no_jszip'), 'error');
+            busy = false;
+            updateFlow();
+            return;
+          }
+          setStatus(t('creating_zip'));
+          const zip = new JSZip();
+          const folder = zip.folder('OpenWatermark');
+          results.forEach(r => folder.file(r.name, r.blob));
+          const zipBlob = await zip.generateAsync({
+            type: 'blob',
+            compression: 'DEFLATE',
+            compressionOptions: { level: 6 }
+          });
+          const url = URL.createObjectURL(zipBlob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `OpenWatermark_${new Date().toISOString().slice(0, 10)}.zip`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 60000);
+          setStatus(t('done_multiple', results.length), 'success');
+        }
+
+        addToCounter(results.length);
+
+        downloadBtn.classList.add('success-flash');
+        const originalText = downloadBtn.textContent;
+        downloadBtn.textContent = '\u2713';
+        setTimeout(() => {
+          downloadBtn.classList.remove('success-flash');
+          downloadBtn.textContent = originalText;
+          updateDownloadLabel();
+        }, 1800);
+
+        setStep(4);
+      } catch (err) {
+        console.error(err);
+        setStatus(t('error_prefix') + (err && err.message ? err.message : err), 'error');
+      } finally {
+        busy = false;
+        updateFlow();
+        setTimeout(() => {
+          if (progressBar) progressBar.classList.remove('visible');
+          if (progressFill) progressFill.style.width = '0%';
+        }, 1200);
+      }
+    });
+  }
+
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      photos = [];
+      if (photoInput) photoInput.value = '';
+      revokePreviewUrl();
+      if (preview) {
+        preview.removeAttribute('src');
+        preview.style.display = 'none';
+      }
+      renderPhotoList();
+      setStatus('');
+      updateFlow();
+    });
+  }
+
+  if (payloadInput) {
+    payloadInput.addEventListener('input', () => {
+      savePayload(payloadInput.value);
+    });
+  }
+
+  if (suffixInput) {
+    suffixInput.addEventListener('input', () => {
+      saveSuffix(suffixInput.value);
+    });
+  }
+
+  if (suffixDropdownBtn && suffixMenu) {
+    suffixDropdownBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      suffixMenu.style.display = suffixMenu.style.display === 'none' ? 'block' : 'none';
+    });
+
+    suffixMenu.querySelectorAll('.suffix-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.dataset.value;
+        if (suffixInput) suffixInput.value = val;
+        saveSuffix(val);
+        suffixMenu.style.display = 'none';
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!suffixMenu.contains(e.target) && e.target !== suffixDropdownBtn) {
+        suffixMenu.style.display = 'none';
+      }
+    });
+  }
+
+  applyTranslations();
+
+  const savedPayload = loadPayloadValue();
+  if (savedPayload && payloadInput) payloadInput.value = savedPayload;
+
+  const savedSuffix = loadSuffixValue();
+  if (suffixInput) suffixInput.value = savedSuffix;
+
+  const savedText = loadTextValue();
+  if (savedText && wmText) wmText.value = savedText;
+
+  const savedMode = loadWmMode();
+  setWmMode(savedMode);
+
+  const savedColor = loadTextColor();
+  setTextColor(savedColor);
+
+  restoreLogo();
+  updateCounterDisplay();
+
+  // Wacht heel even zodat invisible-watermark.js zeker geladen is
+  setTimeout(() => {
+    const hasInvisible = typeof window.OpenWatermarkInvisible === 'object'
+      && typeof window.OpenWatermarkInvisible.embed === 'function';
+
+    if (invisibleAlert) {
+      if (!hasInvisible) {
+        invisibleAlert.classList.add('visible');
+      } else {
+        invisibleAlert.classList.remove('visible');
+        console.log('Onzichtbaar watermerk geladen, versie:', window.OpenWatermarkInvisible.version);
+      }
+    }
+  }, 100);
+
+  updateFlow();
+})();
