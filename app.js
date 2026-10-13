@@ -1,6 +1,6 @@
 /* OpenWatermark - app.js
- * Versie 2.1.0 - MIT-licentie
- * Alleen Nederlands. Dubbelklik op slider = terug naar standaard.
+ * Versie 2.2.0 - MIT-licentie
+ * Lightroom-stijl. Alleen Nederlands. Dubbelklik slider = reset.
  */
 (function () {
   'use strict';
@@ -66,6 +66,7 @@
     notice_strong: "Eerlijk:",
     notice_text: " een zichtbaar watermerk maakt verwijdering lastiger, maar niet onmogelijk. De onzichtbare laag overleeft JPEG-compressie en verkleining, maar is geen absolute garantie. Voor echte herkomstbescherming is C2PA-metadata nodig, dat zit al in moderne camera's zoals Nikon Z9 en Canon R5 Mark II.",
     footer_text: "OpenWatermark - Open source op",
+    footer_info: "Info",
     footer_privacy: "Je foto's blijven op je toestel. Niets wordt verstuurd.",
     invisible_alert: "De onzichtbare watermerk-laag kon niet geladen worden. Je foto's krijgen alleen het zichtbare watermerk.",
 
@@ -541,7 +542,6 @@
       if (photos.length > 0 && hasWatermark()) debouncePreview();
     });
 
-    // Dubbelklik: terug naar standaard
     const resetToDefault = () => {
       const def = el.getAttribute('data-default');
       if (def === null) return;
@@ -552,7 +552,6 @@
 
     el.addEventListener('dblclick', resetToDefault);
 
-    // Voor mobiel: twee keer snel tikken
     let lastTap = 0;
     el.addEventListener('touchend', (e) => {
       const now = Date.now();
