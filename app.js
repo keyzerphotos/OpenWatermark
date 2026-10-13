@@ -576,4 +576,173 @@
     ctx.drawImage(baseImg, 0, 0);
 
     const logoW = (canvas.width * parseInt(logoSize.value, 10)) / 100;
-    const logoH = (logoImage.height
+    const logoH = (logoImage.height / logoImage.width) * logoW;
+    const gap = parseInt(spacing.value, 10);
+    const rot = (parseInt(rotation.value, 10) * Math.PI) / 180;
+    const cellW = logoW + gap;
+    const cellH = logoH + gap;
+    const margin = Math.max(logoW, logoH);
+
+    ctx.globalAlpha = parseInt(opacity.value, 10) / 100;
+
+    for (let y = -margin; y < canvas.height + margin; y += cellH) {
+      for (let x = -margin; x < canvas.width + margin; x += cellW) {
+        ctx.save();
+        ctx.translate(x + logoW / 2, y + logoH / 2);
+        ctx.rotate(rot);
+        ctx.drawImage(logoImage, -logoW / 2, -logoH / 2, logoW, logoH);
+        ctx.restore();
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    const visibleBlob = await new Promise((resolve) =>
+      canvas.toBlob(resolve, 'image/jpeg', 0.95)
+    );
+
+    const payload = (payloadInput.value || 'OpenWatermark-standaard').trim();
+
+    if (window.OpenWatermarkInvisible && payload) {
+      try {
+        const visibleImg = await loadImageFromBlob(visibleBlob);
+        return await window.OpenWatermarkInvisible.embed(visibleImg, payload);
+      } catch (err) {
+        console.warn('Onzichtbaar watermerk overgeslagen:', err.message);
+        return visibleBlob;
+      }
+    }
+    return visibleBlob;
+  }
+
+  // ============================================================
+  //  PREVIEW
+  // ============================================================
+  function revokePreviewUrl() {
+    if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
+  }
+
+  async function generatePreview() {
+    if (!logoImage || photos.length === 0) return;
+    try {
+      const img = await loadImage(photos[0].file);
+      const blob = await applyWatermark(img);
+      revokePreviewUrl();
+      previewUrl = URL.createObjectURL(blob);
+      preview.src = previewUrl;
+      preview.style.display = 'block';
+      previewEmpty.classList.add('hidden');
+    } catch (err) {
+      setStatus(t('preview_error') + err.message, 'error');
+    }
+  }
+
+  // ============================================================
+  //  ZIP DOWNLOAD
+  // ============================================================
+  downloadZipBtn.addEventListener('click', async () => {
+    if (busy) return;
+    if (!logoImage || photos.length === 0) return;
+
+    if (typeof JSZip === 'undefined') {
+      setStatus(t('no_jszip'), 'error');
+      return;
+    }
+
+    busy = true;
+    updateFlow();
+    progressBar.classList.add('visible');
+    progressFill.style.width = '0%';
+
+    try {
+      const zip = new JSZip();
+      const folder = zip.folder('OpenWatermark');
+
+      for (let i = 0; i < photos.length; i++) {
+        setStatus(t('processing_one', i + 1, photos.length));
+        const p = photos[i];
+        const img = await loadImage(p.file);
+        const blob = await applyWatermark(img);
+        const baseName = p.file.name.replace(/\.[^.]+$/, '') || `foto_${i + 1}`;
+        folder.file(`${baseName}_watermerk.jpg`, blob);
+        progressFill.style.width = `${((i + 1) / photos.length) * 100}%`;
+        await new Promise(r => setTimeout(r, 0));
+      }
+
+      setStatus(t('creating_zip'));
+      const zipBlob = await zip.generateAsync({
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: { level: 6 }
+      });
+
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `OpenWatermark_${new Date().toISOString().slice(0, 10)}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+      downloadZipBtn.classList.add('success-flash');
+      const originalText = downloadZipBtn.textContent;
+      downloadZipBtn.textContent = '\u2713';
+      setTimeout(() => {
+        downloadZipBtn.classList.remove('success-flash');
+        downloadZipBtn.textContent = originalText;
+      }, 1800);
+
+      setStep(4);
+      setStatus(t('done_zip', photos.length), 'success');
+    } catch (err) {
+      console.error(err);
+      setStatus(t('error_prefix') + (err && err.message ? err.message : err), 'error');
+    } finally {
+      busy = false;
+      updateFlow();
+      setTimeout(() => {
+        progressBar.classList.remove('visible');
+        progressFill.style.width = '0%';
+      }, 1200);
+    }
+  });
+
+  // ============================================================
+  //  RESET (alleen foto's, logo blijft bewaard)
+  // ============================================================
+  resetBtn.addEventListener('click', () => {
+    photos = [];
+    photoInput.value = '';
+    revokePreviewUrl();
+    preview.removeAttribute('src');
+    preview.style.display = 'none';
+    renderPhotoList();
+    setStatus('');
+    updateFlow();
+  });
+
+  // ============================================================
+  //  PAYLOAD OPSLAAN
+  // ============================================================
+  payloadInput.addEventListener('input', () => {
+    savePayload(payloadInput.value);
+  });
+
+  // ============================================================
+  //  INIT
+  // ============================================================
+  applyTranslations();
+
+  const savedPayload = loadPayload();
+  if (savedPayload) {
+    payloadInput.value = savedPayload;
+  }
+
+  restoreLogoFromStorage();
+
+  if (!window.OpenWatermarkInvisible) {
+    invisibleAlert.classList.add('visible');
+  }
+
+  updateFlow();
+})();
