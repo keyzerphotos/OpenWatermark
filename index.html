@@ -34,16 +34,12 @@
   }
 
   header {
-    width: 100%;
-    max-width: 780px;
-    margin-bottom: 28px;
-    text-align: center;
+    width: 100%; max-width: 780px;
+    margin-bottom: 28px; text-align: center;
   }
   .logo {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    display: inline-flex; align-items: center;
+    gap: 10px; margin-bottom: 10px;
   }
   .logo-mark {
     width: 36px; height: 36px;
@@ -64,8 +60,7 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 16px;
+    padding: 20px; margin-bottom: 16px;
   }
   .card-title {
     font-size: 0.75rem; font-weight: 600;
@@ -81,10 +76,8 @@
   .drop-zone {
     border: 2px dashed var(--border);
     border-radius: 12px;
-    padding: 28px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
+    padding: 28px 20px; text-align: center;
+    cursor: pointer; transition: all 0.2s;
     background: var(--surface-2);
   }
   .drop-zone:hover, .drop-zone.dragover {
@@ -96,8 +89,8 @@
   .drop-zone .hint { font-size: 0.75rem; color: var(--text-dim); }
 
   .photo-list {
-    margin-top: 14px; max-height: 240px; overflow-y: auto;
-    display: none;
+    margin-top: 14px; max-height: 240px;
+    overflow-y: auto; display: none;
   }
   .photo-list.visible { display: block; }
   .photo-item {
@@ -118,6 +111,58 @@
     padding: 4px 8px; font-size: 1rem; line-height: 1;
   }
   .photo-item .remove:hover { color: var(--danger); }
+
+  .logo-mode {
+    display: flex; gap: 6px; margin-bottom: 14px;
+  }
+  .logo-mode button {
+    flex: 1; padding: 10px 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 8px;
+    font-size: 0.8rem; font-weight: 500;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.15s;
+  }
+  .logo-mode button.active {
+    background: rgba(240, 180, 41, 0.12);
+    border-color: var(--accent); color: var(--accent);
+    font-weight: 600;
+  }
+
+  .text-logo-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px; background: var(--surface-2);
+    border-radius: 10px; margin-bottom: 10px;
+  }
+  .text-logo-row input {
+    flex: 1; padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 0.9rem; font-family: inherit;
+  }
+  .text-logo-row input:focus {
+    outline: none; border-color: var(--accent);
+  }
+
+  .text-preview {
+    padding: 20px;
+    background: repeating-conic-gradient(#2a2a2a 0% 25%, #1c1c1c 0% 50%) 50% / 16px 16px;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+  }
+  .text-preview .sample {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #fff;
+    opacity: 0.75;
+    letter-spacing: 0.02em;
+  }
 
   .logo-row {
     display: flex; align-items: center; gap: 14px;
@@ -166,7 +211,6 @@
     font-variant-numeric: tabular-nums; font-weight: 600;
   }
 
-  /* Select / buttons-groep */
   .select-row {
     padding: 10px 0; border-bottom: 1px solid var(--border);
   }
@@ -175,9 +219,7 @@
     display: block; font-size: 0.8rem; color: var(--text-dim);
     margin-bottom: 8px;
   }
-  .segmented {
-    display: flex; gap: 6px; flex-wrap: wrap;
-  }
+  .segmented { display: flex; gap: 6px; flex-wrap: wrap; }
   .segmented button {
     flex: 1; min-width: 70px;
     padding: 10px 12px;
@@ -185,16 +227,13 @@
     border: 1px solid var(--border);
     color: var(--text-dim);
     border-radius: 8px;
-    font-size: 0.78rem;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: inherit;
+    font-size: 0.78rem; font-weight: 500;
+    cursor: pointer; font-family: inherit;
     transition: all 0.15s;
   }
   .segmented button.active {
     background: rgba(240, 180, 41, 0.12);
-    border-color: var(--accent);
-    color: var(--accent);
+    border-color: var(--accent); color: var(--accent);
     font-weight: 600;
   }
   .segmented button:hover:not(.active) {
@@ -202,19 +241,14 @@
   }
 
   .text-input {
-    width: 100%;
-    padding: 10px 12px;
+    width: 100%; padding: 10px 12px;
     background: var(--surface-2);
     border: 1px solid var(--border);
     border-radius: 8px;
     color: var(--text);
-    font-size: 0.85rem;
-    font-family: inherit;
+    font-size: 0.85rem; font-family: inherit;
   }
-  .text-input:focus {
-    outline: none;
-    border-color: var(--accent);
-  }
+  .text-input:focus { outline: none; border-color: var(--accent); }
 
   .color-row {
     display: flex; align-items: center; gap: 10px;
@@ -231,22 +265,17 @@
     background: var(--surface-2);
     cursor: pointer; padding: 2px;
   }
-  .color-presets {
-    display: flex; gap: 6px;
-  }
+  .color-presets { display: flex; gap: 6px; }
   .color-presets button {
-    width: 28px; height: 28px;
-    border-radius: 50%;
+    width: 28px; height: 28px; border-radius: 50%;
     border: 2px solid var(--border);
-    cursor: pointer;
-    padding: 0;
+    cursor: pointer; padding: 0;
   }
   .color-presets button:hover { border-color: var(--accent); }
 
   .btn {
     display: inline-flex; align-items: center; justify-content: center;
-    gap: 8px;
-    padding: 14px 20px;
+    gap: 8px; padding: 14px 20px;
     border: none; border-radius: 12px;
     font-size: 0.9rem; font-weight: 600;
     cursor: pointer; transition: all 0.15s;
@@ -273,17 +302,9 @@
   .preview-wrap.visible { display: block; }
   .preview-wrap img {
     width: 100%; border-radius: 10px;
-    border: 1px solid var(--border);
-    display: block;
+    border: 1px solid var(--border); display: block;
   }
-  .preview-label {
-    font-size: 0.72rem; color: var(--text-dim);
-    margin-bottom: 6px; text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  .compare-toggle {
-    display: flex; gap: 6px; margin-bottom: 10px;
-  }
+  .compare-toggle { display: flex; gap: 6px; margin-bottom: 10px; }
   .compare-toggle button {
     flex: 1; padding: 8px;
     background: var(--surface-2);
@@ -326,8 +347,7 @@
     border-left: 3px solid var(--accent);
     border-radius: 10px;
     padding: 14px 16px;
-    font-size: 0.76rem;
-    color: var(--text-dim);
+    font-size: 0.76rem; color: var(--text-dim);
     line-height: 1.6; margin-top: 20px;
   }
   .notice strong { color: var(--accent); font-weight: 600; }
@@ -338,10 +358,261 @@
   }
   footer a { color: var(--accent); text-decoration: none; }
 
-  /* Modal */
   .modal-overlay {
     position: fixed; inset: 0;
     background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 100; padding: 20px;
+  }
+  .modal-overlay.visible { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 400px; width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+  .modal h3 { font-size: 1.1rem; margin-bottom: 8px; font-weight: 700; }
+  .modal p {
+    font-size: 0.85rem; color: var(--text-dim);
+    margin-bottom: 20px; line-height: 1.5;
+  }
+  .modal-buttons { display: flex; flex-direction: column; gap: 10px; }
+  .modal-buttons .btn { width: 100%; }
+
+  @media (max-width: 500px) {
+    .slider-row, .select-row > label, .color-row { font-size: 0.85rem; }
+    .slider-row label { min-width: 90px; }
+    .slider-row .value { min-width: 44px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">OW</div>
+    <h1>OpenWatermark</h1>
+  </div>
+  <p class="subtitle">Bescherm je foto's met je eigen naam of logo. Alles lokaal in je browser — niets wordt geüpload.</p>
+</header>
+
+<!-- Foto's -->
+<div class="card">
+  <div class="card-title">Foto's</div>
+  <div class="drop-zone" id="photoZone">
+    <div class="icon">📷</div>
+    <div class="label">Sleep je foto's hierheen</div>
+    <div class="hint">of tik om te kiezen · meerdere foto's mogelijk</div>
+    <input type="file" id="photoInput" accept="image/*" multiple hidden>
+  </div>
+  <div class="photo-list" id="photoList"></div>
+</div>
+
+<!-- Watermerk-bron -->
+<div class="card">
+  <div class="card-title">Watermerk</div>
+
+  <div class="logo-mode" id="logoModeGroup">
+    <button data-value="text" class="active">✎ Tekst (© naam)</button>
+    <button data-value="image">🖼 Eigen logo</button>
+  </div>
+
+  <!-- Tekst-modus -->
+  <div id="textMode">
+    <div class="text-preview">
+      <div class="sample" id="textSample">© Jouw Naam</div>
+    </div>
+    <div class="text-logo-row">
+      <input type="text" id="wmText" placeholder="Bijv. © Jan Jansen 2026" value="© Jouw Naam">
+    </div>
+  </div>
+
+  <!-- Logo-modus -->
+  <div id="imageMode" style="display:none;">
+    <div class="drop-zone" id="logoZone">
+      <div class="icon">✦</div>
+      <div class="label">Sleep je logo hierheen</div>
+      <div class="hint">PNG met transparante achtergrond werkt het best</div>
+      <input type="file" id="logoInput" accept="image/png,image/svg+xml,image/webp" hidden>
+    </div>
+    <div id="logoInfoRow" style="display:none; margin-top:14px;">
+      <div class="logo-row">
+        <img id="logoThumb" class="logo-thumb" alt="">
+        <div class="logo-info">
+          <div class="name" id="logoName">logo.png</div>
+          <div class="meta">Klaar voor gebruik</div>
+        </div>
+        <button class="btn btn-secondary btn-small" id="changeLogoBtn">Wijzigen</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Instellingen -->
+<div class="card">
+  <div class="card-title">Instellingen</div>
+  <div class="controls visible" id="controls">
+
+    <div class="select-row">
+      <label>Positie</label>
+      <div class="segmented" id="positionGroup">
+        <button data-value="tile" class="active">Over hele foto</button>
+        <button data-value="center">Midden</button>
+        <button data-value="corner">Hoek</button>
+      </div>
+    </div>
+
+    <div class="slider-row">
+      <label>Grootte</label>
+      <input type="range" id="logoSize" min="5" max="40" value="15">
+      <span class="value" id="logoSizeVal">15%</span>
+    </div>
+
+    <div class="slider-row">
+      <label>Transparantie</label>
+      <input type="range" id="opacity" min="10" max="80" value="35">
+      <span class="value" id="opacityVal">35%</span>
+    </div>
+
+    <div class="slider-row">
+      <label>Rotatie</label>
+      <input type="range" id="rotation" min="-60" max="0" value="-30">
+      <span class="value" id="rotationVal">-30°</span>
+    </div>
+
+    <div class="slider-row">
+      <label>Afstand</label>
+      <input type="range" id="spacing" min="100" max="500" value="220">
+      <span class="value" id="spacingVal">220</span>
+    </div>
+
+    <div class="color-row">
+      <label>Kleur</label>
+      <input type="color" id="wmColor" value="#ffffff">
+      <div class="color-presets">
+        <button data-color="#ffffff" style="background:#ffffff" title="Wit"></button>
+        <button data-color="#000000" style="background:#000000" title="Zwart"></button>
+        <button data-color="#f0b429" style="background:#f0b429" title="Goud"></button>
+        <button data-color="#e5484d" style="background:#e5484d" title="Rood"></button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Uitvoer -->
+<div class="card">
+  <div class="card-title">Uitvoer</div>
+
+  <div class="select-row">
+    <label>Formaat</label>
+    <div class="segmented" id="formatGroup">
+      <button data-value="jpg" class="active">JPG</button>
+      <button data-value="png">PNG</button>
+    </div>
+  </div>
+
+  <div class="slider-row" id="qualityRow">
+    <label>JPG-kwaliteit</label>
+    <input type="range" id="quality" min="60" max="100" value="92">
+    <span class="value" id="qualityVal">92%</span>
+  </div>
+
+  <div class="select-row">
+    <label>Maximale breedte</label>
+    <div class="segmented" id="maxWidthGroup">
+      <button data-value="0" class="active">Origineel</button>
+      <button data-value="1920">1920 px</button>
+      <button data-value="1280">1280 px</button>
+      <button data-value="800">800 px</button>
+    </div>
+    <p style="font-size:0.72rem; color:var(--text-dim); margin-top:8px; line-height:1.5;">
+      Kleinere foto's zijn onbruikbaar voor drukwerk als iemand een screenshot maakt.
+    </p>
+  </div>
+
+  <div class="select-row">
+    <label>Bestandsnaam-suffix</label>
+    <input type="text" class="text-input" id="filenameSuffix" value="_watermerk" placeholder="Bijv. _watermerk">
+  </div>
+
+</div>
+
+<!-- Resultaat -->
+<div class="card" id="resultCard" style="display:none;">
+  <div class="card-title">Resultaat</div>
+
+  <div class="compare-toggle">
+    <button id="showResult" class="active">Resultaat</button>
+    <button id="showOriginal">Origineel</button>
+  </div>
+
+  <div class="preview-wrap visible" id="previewWrap">
+    <img id="preview" alt="Voorbeeld">
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" id="downloadBtn">⬇ Downloaden</button>
+  </div>
+  <div class="progress-bar" id="progressBar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" id="resetBtn">Alles wissen</button>
+  </div>
+</div>
+
+<div class="status" id="status"></div>
+
+<div class="notice">
+  <strong>Eerlijk:</strong> een zichtbaar watermerk maakt verwijdering lastiger, maar niet onmogelijk. Herhaling over de hele foto is moeilijker weg te poetsen dan één logo in een hoek. Voor echte herkomstbescherming is C2PA-metadata nodig — dat zit al in moderne camera's zoals Nikon Z9 en Canon R5 Mark II.
+</div>
+
+<footer>
+  OpenWatermark · Open source op <a href="https://github.com/keyzerphotos/OpenWatermark">GitHub</a><br>
+  Je foto's blijven op je toestel. Niets wordt verstuurd.
+</footer>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>Hoe wil je downloaden?</h3>
+    <p id="modalText">Je hebt meerdere foto's. Kies hoe je ze wilt opslaan.</p>
+    <div class="modal-buttons">
+      <button class="btn btn-primary" id="modalZip">Als ZIP-bestand</button>
+      <button class="btn btn-secondary" id="modalLoose">Losse bestanden</button>
+      <button class="btn btn-secondary" id="modalCancel" style="background:transparent; border:none; color:var(--text-dim);">Annuleren</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ---------- Elementen ----------
+  const photoZone = document.getElementById('photoZone');
+  const photoInput = document.getElementById('photoInput');
+  const photoList = document.getElementById('photoList');
+  const logoZone = document.getElementById('logoZone');
+  const logoInput = document.getElementById('logoInput');
+  const logoInfoRow = document.getElementById('logoInfoRow');
+  const logoThumb = document.getElementById('logoThumb');
+  const logoName = document.getElementById('logoName');
+  const changeLogoBtn = document.getElementById('changeLogoBtn');
+  const controls = document.getElementById('controls');
+  const resultCard = document.getElementById('resultCard');
+  const preview = document.getElementById('preview');
+  const statusEl = document.getElementById('status');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const progressBar = document.getElementById('progressBar');
+  const progressFill = document.getElementById('progressFill');
+  const modal = document.getElementById('modal');
+  const modalText = document.getElementById('modalTround: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(4px);
     display: none;
     align-items: center; justify-content: center;
