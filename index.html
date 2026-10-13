@@ -671,4 +671,96 @@
     <div class="drop-icon">✦</div>
     <div class="drop-label" data-i18n="logo_drop"></div>
     <div class="drop-hint" data-i18n="logo_hint"></div>
-    <input type="file" id="logoInput" accept="image/png,image/svg+xml,image/webp" hidden
+    <input type="file" id="logoInput" accept="image/png,image/svg+xml,image/webp" hidden>
+  </div>
+  <div id="logoInfoRow" style="display:none; margin-top:12px;">
+    <div class="logo-row">
+      <img id="logoThumb" class="logo-thumb" alt="">
+      <div class="logo-info">
+        <div class="name" id="logoName">logo.png</div>
+        <div class="meta" data-i18n="logo_ready"></div>
+      </div>
+      <button class="btn btn-secondary btn-small" id="changeLogoBtn" data-i18n="logo_change"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Stap 3: Instellingen -->
+<div class="card locked" id="cardSettings">
+  <div class="card-head">
+    <div class="card-num">3</div>
+    <div>
+      <div class="card-title" data-i18n="settings_title"></div>
+      <div class="card-hint" data-i18n="settings_hint"></div>
+    </div>
+  </div>
+  <div class="slider-row">
+    <label data-i18n="set_size"></label>
+    <input type="range" id="logoSize" min="5" max="40" value="15">
+    <span class="value" id="logoSizeVal">15%</span>
+  </div>
+  <div class="slider-row">
+    <label data-i18n="set_opacity"></label>
+    <input type="range" id="opacity" min="10" max="80" value="35">
+    <span class="value" id="opacityVal">35%</span>
+  </div>
+  <div class="slider-row">
+    <label data-i18n="set_rotation"></label>
+    <input type="range" id="rotation" min="-60" max="0" value="-30">
+    <span class="value" id="rotationVal">-30°</span>
+  </div>
+  <div class="slider-row">
+    <label data-i18n="set_spacing"></label>
+    <input type="range" id="spacing" min="100" max="500" value="220">
+    <span class="value" id="spacingVal">220</span>
+  </div>
+  <div class="slider-row">
+    <label data-i18n="set_payload"></label>
+    <input type="text" id="payloadInput" class="text-input" data-i18n-placeholder="set_payload_hint">
+  </div>
+</div>
+
+<!-- Stap 4: Resultaat -->
+<div class="card locked" id="cardResult">
+  <div class="card-head">
+    <div class="card-num">4</div>
+    <div>
+      <div class="card-title" data-i18n="result_title"></div>
+      <div class="card-hint" data-i18n="result_hint"></div>
+    </div>
+  </div>
+  <div class="preview-wrap" id="previewWrap">
+    <div class="preview-label" data-i18n="result_preview"></div>
+    <img id="preview" alt="">
+  </div>
+  <div class="progress-bar" id="progressBar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+</div>
+
+<div class="status" id="status"></div>
+
+<div class="notice">
+  <strong data-i18n="notice_strong"></strong>
+  <span data-i18n="notice_text"></span>
+</div>
+
+<footer>
+  <span data-i18n="footer_text"></span>
+  <a href="https://github.com/keyzerphotos/OpenWatermark">GitHub</a><br>
+  <span data-i18n="footer_privacy"></span>
+</footer>
+
+<!-- Vaste actiebalk onderaan -->
+<div class="action-bar" id="actionBar">
+  <div class="action-bar-inner">
+    <button class="btn btn-secondary" id="resetBtn" data-i18n="result_reset"></button>
+    <button class="btn btn-primary" id="downloadZipBtn" data-i18n="result_download"></button>
+  </div>
+</div>
+
+<script src="invisible-watermark.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
