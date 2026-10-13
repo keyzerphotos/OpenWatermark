@@ -22,7 +22,6 @@
     --text-muted: #666666;
     --accent: #1473e6;
     --accent-hi: #2b8bf7;
-    --accent-dim: #0d5bb8;
     --selected: #0d66d0;
     --success: #33a852;
     --warning: #e68619;
@@ -63,7 +62,7 @@
     padding: calc(18px + var(--safe-top)) 14px calc(40px + var(--safe-bottom));
   }
 
-  /* Header - compact en zakelijk */
+  /* Header */
   header {
     text-align: center;
     margin-bottom: 20px;
@@ -105,7 +104,39 @@
     font-weight: 400;
   }
 
-  /* Stappen - ronde dots met Lightroom-kleuren */
+  /* Info-knop rechtsboven */
+  .info-btn-top {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--panel);
+    border: 1px solid var(--border-hi);
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    transition: all 0.15s;
+    padding: 0;
+    line-height: 1;
+  }
+  .info-btn-top:hover {
+    background: var(--panel-3);
+    color: var(--text);
+  }
+  .info-btn-top:active {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+  }
+
+  /* Stappen */
   .steps {
     display: flex;
     align-items: center;
@@ -166,7 +197,7 @@
     z-index: 1;
   }
 
-  /* Kaarten - strak, dunne border */
+  /* Kaarten */
   .card {
     background: var(--panel);
     border: 1px solid var(--border);
@@ -219,7 +250,7 @@
     font-weight: 400;
   }
 
-  /* Drop zones - dunne dashed border */
+  /* Drop zones */
   .drop-zone {
     border: 1px dashed var(--border-hi);
     border-radius: var(--radius-sm);
@@ -396,7 +427,7 @@
   }
   .logo-info .meta { color: var(--text-muted); font-size: 0.62rem; }
 
-  /* Sliders - Lightroom stijl */
+  /* Sliders */
   .slider-row {
     display: flex;
     align-items: center;
@@ -710,7 +741,7 @@
   }
   .alert.visible { display: block; }
 
-  /* Teller - subtiel, geen kader */
+  /* Teller */
   .counter-box {
     display: none;
     margin-top: 20px;
@@ -728,13 +759,13 @@
     margin-right: 2px;
   }
 
-  /* Footer met info-link */
+  /* Footer */
   footer {
     margin-top: 20px;
     font-size: 0.62rem;
     color: var(--text-muted);
     text-align: center;
-    line-height: 1.7;
+    line-height: 1.8;
     padding: 0 12px;
   }
   footer a {
@@ -742,13 +773,20 @@
     text-decoration: none;
   }
   footer a:hover { text-decoration: underline; }
-  footer .footer-info {
-    color: var(--text-dim);
-    cursor: pointer;
-    text-decoration: none;
-  }
-  footer .footer-info:hover {
+
+  .footer-info-btn {
+    background: transparent;
+    border: none;
     color: var(--accent-hi);
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 400;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+  .footer-info-btn:hover {
     text-decoration: underline;
   }
   .footer-divider {
@@ -835,6 +873,7 @@
 <div class="wrapper">
 
   <header>
+    <button class="info-btn-top" id="infoBtn" aria-label="Info">?</button>
     <div class="logo">
       <div class="logo-mark">OW</div>
       <h1>OpenWatermark</h1>
@@ -1025,7 +1064,7 @@
     <span data-i18n="footer_text"></span>
     <a href="https://github.com/keyzerphotos/OpenWatermark">GitHub</a>
     <span class="footer-divider">·</span>
-    <span class="footer-info" id="infoBtn" data-i18n="footer_info"></span>
+    <button type="button" class="footer-info-btn" id="infoBtnFooter" data-i18n="footer_info"></button>
     <br>
     <span data-i18n="footer_privacy"></span>
   </footer>
