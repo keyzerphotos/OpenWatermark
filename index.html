@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0a0a0a">
+<meta name="theme-color" content="#08080a">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>OpenWatermark</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23f0b429'/%3E%3Ctext x='50' y='68' font-family='sans-serif' font-size='54' font-weight='800' text-anchor='middle' fill='%2308080a'%3EOW%3C/text%3E%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.2/dist/jszip.min.js"></script>
 <style>
   :root {
@@ -35,28 +37,31 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  html, body {
+  html {
+    background: var(--bg);
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
     background: var(--bg);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
-    -webkit-text-size-adjust: 100%;
+    margin: 0;
+    min-height: 100vh;
     overflow-x: hidden;
-    touch-action: pan-y;
   }
 
-  body {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  /* De wrapper regelt de layout, niet de body */
+  .wrapper {
+    max-width: 720px;
+    margin: 0 auto;
     padding: calc(24px + var(--safe-top)) 16px calc(60px + var(--safe-bottom));
   }
 
   /* ---------- Header ---------- */
   header {
-    width: 100%;
-    max-width: 720px;
     text-align: center;
     margin-bottom: 28px;
   }
@@ -95,8 +100,6 @@
 
   /* ---------- Stap-indicator ---------- */
   .steps {
-    width: 100%;
-    max-width: 720px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -161,8 +164,6 @@
 
   /* ---------- Kaarten ---------- */
   .card {
-    width: 100%;
-    max-width: 720px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -205,7 +206,6 @@
     font-size: 0.95rem;
     font-weight: 700;
     letter-spacing: -0.01em;
-    flex: 1;
   }
   .card-hint {
     font-size: 0.72rem;
@@ -248,7 +248,6 @@
     max-height: 240px;
     overflow-y: auto;
     display: none;
-    -webkit-overflow-scrolling: touch;
   }
   .photo-list.visible { display: block; }
   .photo-item {
@@ -304,14 +303,19 @@
 
   /* ---------- Sliders ---------- */
   .slider-row {
-    display: flex; align-items: center; gap: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     padding: 14px 0;
     border-bottom: 1px solid var(--border);
   }
   .slider-row:last-child { border-bottom: none; }
   .slider-row label {
-    font-size: 0.82rem; color: var(--text-dim);
-    min-width: 100px; font-weight: 500;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    min-width: 100px;
+    font-weight: 500;
+    flex-shrink: 0;
   }
   .slider-row input[type="range"] {
     flex: 1;
@@ -327,7 +331,8 @@
   .slider-row input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 22px; height: 22px;
+    width: 28px;
+    height: 28px;
     background: var(--accent);
     border-radius: 50%;
     border: 2px solid var(--surface);
@@ -335,16 +340,21 @@
     cursor: pointer;
   }
   .slider-row input[type="range"]::-moz-range-thumb {
-    width: 22px; height: 22px;
+    width: 28px;
+    height: 28px;
     background: var(--accent);
     border-radius: 50%;
     border: 2px solid var(--surface);
     cursor: pointer;
   }
   .slider-row .value {
-    font-size: 0.75rem; color: var(--accent);
-    min-width: 46px; text-align: right;
-    font-weight: 700; font-variant-numeric: tabular-nums;
+    font-size: 0.75rem;
+    color: var(--accent);
+    min-width: 46px;
+    text-align: right;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
   }
 
   /* ---------- Text input ---------- */
@@ -367,7 +377,6 @@
 
   /* ---------- Preview ---------- */
   .preview-wrap {
-    margin-top: 4px;
     border-radius: var(--radius-sm);
     overflow: hidden;
     border: 1px solid var(--border);
@@ -375,24 +384,32 @@
   }
   .preview-wrap img { width: 100%; display: block; }
   .preview-label {
-    font-size: 0.68rem; color: var(--text-muted);
+    font-size: 0.68rem;
+    color: var(--text-muted);
     padding: 8px 12px;
     background: var(--surface-2);
     border-bottom: 1px solid var(--border);
     text-transform: uppercase;
-    letter-spacing: 0.06em; font-weight: 600;
+    letter-spacing: 0.06em;
+    font-weight: 600;
   }
 
   /* ---------- Buttons ---------- */
   .btn {
-    display: inline-flex; align-items: center; justify-content: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     gap: 8px;
     padding: 15px 22px;
-    border: none; border-radius: 12px;
-    font-size: 0.92rem; font-weight: 700;
-    cursor: pointer; font-family: inherit;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
     transition: all 0.15s;
-    width: 100%; min-height: 50px;
+    width: 100%;
+    min-height: 50px;
     letter-spacing: -0.01em;
   }
   .btn:active { transform: scale(0.985); }
@@ -410,16 +427,16 @@
   .btn-small {
     padding: 9px 14px;
     font-size: 0.78rem;
-    width: auto; min-height: 40px;
+    width: auto;
+    min-height: 40px;
     border-radius: 9px;
+    flex-shrink: 0;
   }
 
   /* ---------- Actiebalk (in-flow) ---------- */
   .action-bar {
-    width: 100%;
-    max-width: 720px;
-    margin-top: 20px;
     display: none;
+    margin-top: 20px;
   }
   .action-bar.visible { display: block; }
   .action-bar-inner {
@@ -430,10 +447,11 @@
 
   /* ---------- Status ---------- */
   .status {
-    font-size: 0.82rem; color: var(--text-dim);
-    text-align: center; min-height: 1.4em;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    text-align: center;
+    min-height: 1.4em;
     margin: 16px 0;
-    width: 100%; max-width: 720px;
     padding: 0 12px;
     transition: color 0.2s;
   }
@@ -442,9 +460,11 @@
 
   /* ---------- Progress ---------- */
   .progress-bar {
-    width: 100%; height: 5px;
+    width: 100%;
+    height: 5px;
     background: var(--border);
-    border-radius: 3px; overflow: hidden;
+    border-radius: 3px;
+    overflow: hidden;
     margin-top: 12px;
     display: none;
   }
@@ -452,18 +472,19 @@
   .progress-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--accent), var(--accent-hi));
-    width: 0%; transition: width 0.2s;
+    width: 0%;
+    transition: width 0.2s;
   }
 
   /* ---------- Notice ---------- */
   .notice {
-    width: 100%; max-width: 720px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-left: 3px solid var(--accent);
     border-radius: 10px;
     padding: 14px 16px;
-    font-size: 0.75rem; color: var(--text-dim);
+    font-size: 0.75rem;
+    color: var(--text-dim);
     line-height: 1.6;
     margin-top: 20px;
   }
@@ -472,26 +493,32 @@
   /* ---------- Footer ---------- */
   footer {
     margin-top: 28px;
-    font-size: 0.7rem; color: var(--text-muted);
-    text-align: center; line-height: 1.7;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.7;
     padding: 0 12px;
   }
   footer a { color: var(--accent); text-decoration: none; }
 
   /* ---------- Mobiel ---------- */
   @media (max-width: 520px) {
-    body { padding-left: 12px; padding-right: 12px; }
+    .wrapper { padding-left: 12px; padding-right: 12px; }
     h1 { font-size: 1.3rem; }
     .subtitle { font-size: 0.78rem; }
     .card { padding: 16px; }
+
     .slider-row { flex-wrap: wrap; gap: 8px; }
     .slider-row label { min-width: auto; flex: 1; font-size: 0.78rem; }
     .slider-row input[type="range"] { flex-basis: 100%; order: 3; }
+
     .step-label { font-size: 0.56rem; }
     .step-dot { width: 26px; height: 26px; font-size: 0.7rem; }
     .steps::before { top: 13px; }
+
     .drop-zone { padding: 24px 16px; min-height: 104px; }
     .drop-label { font-size: 0.86rem; }
+
     .action-bar-inner { flex-direction: column; }
   }
 
@@ -502,146 +529,150 @@
 </head>
 <body>
 
-<header>
-  <div class="logo">
-    <div class="logo-mark">OW</div>
-    <h1>OpenWatermark</h1>
-  </div>
-  <p class="subtitle" data-i18n="subtitle"></p>
-</header>
+<div class="wrapper">
 
-<div class="steps" id="steps">
-  <div class="step" data-step="1">
-    <div class="step-dot">1</div>
-    <div class="step-label" data-i18n="step_photos"></div>
-  </div>
-  <div class="step" data-step="2">
-    <div class="step-dot">2</div>
-    <div class="step-label" data-i18n="step_logo"></div>
-  </div>
-  <div class="step" data-step="3">
-    <div class="step-dot">3</div>
-    <div class="step-label" data-i18n="step_settings"></div>
-  </div>
-  <div class="step" data-step="4">
-    <div class="step-dot">4</div>
-    <div class="step-label" data-i18n="step_download"></div>
-  </div>
-</div>
+  <header>
+    <div class="logo">
+      <div class="logo-mark">OW</div>
+      <h1>OpenWatermark</h1>
+    </div>
+    <p class="subtitle" data-i18n="subtitle"></p>
+  </header>
 
-<div class="card" id="cardPhotos">
-  <div class="card-head">
-    <div class="card-num">1</div>
-    <div>
-      <div class="card-title" data-i18n="photos_title"></div>
-      <div class="card-hint" data-i18n="photos_hint_card"></div>
+  <div class="steps" id="steps">
+    <div class="step" data-step="1">
+      <div class="step-dot">1</div>
+      <div class="step-label" data-i18n="step_photos"></div>
+    </div>
+    <div class="step" data-step="2">
+      <div class="step-dot">2</div>
+      <div class="step-label" data-i18n="step_logo"></div>
+    </div>
+    <div class="step" data-step="3">
+      <div class="step-dot">3</div>
+      <div class="step-label" data-i18n="step_settings"></div>
+    </div>
+    <div class="step" data-step="4">
+      <div class="step-dot">4</div>
+      <div class="step-label" data-i18n="step_download"></div>
     </div>
   </div>
-  <div class="drop-zone" id="photoZone">
-    <div class="drop-icon">📷</div>
-    <div class="drop-label" data-i18n="photos_drop"></div>
-    <div class="drop-hint" data-i18n="photos_hint"></div>
-    <input type="file" id="photoInput" accept="image/*" multiple hidden>
-  </div>
-  <div class="photo-list" id="photoList"></div>
-</div>
 
-<div class="card locked" id="cardLogo">
-  <div class="card-head">
-    <div class="card-num">2</div>
-    <div>
-      <div class="card-title" data-i18n="logo_title"></div>
-      <div class="card-hint" data-i18n="logo_hint_card"></div>
-    </div>
-  </div>
-  <div class="drop-zone" id="logoZone">
-    <div class="drop-icon">✦</div>
-    <div class="drop-label" data-i18n="logo_drop"></div>
-    <div class="drop-hint" data-i18n="logo_hint"></div>
-    <input type="file" id="logoInput" accept="image/png,image/svg+xml,image/webp" hidden>
-  </div>
-  <div id="logoInfoRow" style="display:none; margin-top:12px;">
-    <div class="logo-row">
-      <img id="logoThumb" class="logo-thumb" alt="">
-      <div class="logo-info">
-        <div class="name" id="logoName">logo.png</div>
-        <div class="meta" data-i18n="logo_ready"></div>
+  <div class="card" id="cardPhotos">
+    <div class="card-head">
+      <div class="card-num">1</div>
+      <div>
+        <div class="card-title" data-i18n="photos_title"></div>
+        <div class="card-hint" data-i18n="photos_hint_card"></div>
       </div>
-      <button class="btn btn-secondary btn-small" id="changeLogoBtn" data-i18n="logo_change"></button>
+    </div>
+    <div class="drop-zone" id="photoZone">
+      <div class="drop-icon">📷</div>
+      <div class="drop-label" data-i18n="photos_drop"></div>
+      <div class="drop-hint" data-i18n="photos_hint"></div>
+      <input type="file" id="photoInput" accept="image/*" multiple hidden>
+    </div>
+    <div class="photo-list" id="photoList"></div>
+  </div>
+
+  <div class="card locked" id="cardLogo">
+    <div class="card-head">
+      <div class="card-num">2</div>
+      <div>
+        <div class="card-title" data-i18n="logo_title"></div>
+        <div class="card-hint" data-i18n="logo_hint_card"></div>
+      </div>
+    </div>
+    <div class="drop-zone" id="logoZone">
+      <div class="drop-icon">✦</div>
+      <div class="drop-label" data-i18n="logo_drop"></div>
+      <div class="drop-hint" data-i18n="logo_hint"></div>
+      <input type="file" id="logoInput" accept="image/png,image/svg+xml,image/webp" hidden>
+    </div>
+    <div id="logoInfoRow" style="display:none; margin-top:12px;">
+      <div class="logo-row">
+        <img id="logoThumb" class="logo-thumb" alt="">
+        <div class="logo-info">
+          <div class="name" id="logoName">logo.png</div>
+          <div class="meta" data-i18n="logo_ready"></div>
+        </div>
+        <button class="btn btn-secondary btn-small" id="changeLogoBtn" data-i18n="logo_change"></button>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="card locked" id="cardSettings">
-  <div class="card-head">
-    <div class="card-num">3</div>
-    <div>
-      <div class="card-title" data-i18n="settings_title"></div>
-      <div class="card-hint" data-i18n="settings_hint"></div>
+  <div class="card locked" id="cardSettings">
+    <div class="card-head">
+      <div class="card-num">3</div>
+      <div>
+        <div class="card-title" data-i18n="settings_title"></div>
+        <div class="card-hint" data-i18n="settings_hint"></div>
+      </div>
+    </div>
+    <div class="slider-row">
+      <label data-i18n="set_size"></label>
+      <input type="range" id="logoSize" min="5" max="40" value="15">
+      <span class="value" id="logoSizeVal">15%</span>
+    </div>
+    <div class="slider-row">
+      <label data-i18n="set_opacity"></label>
+      <input type="range" id="opacity" min="10" max="80" value="35">
+      <span class="value" id="opacityVal">35%</span>
+    </div>
+    <div class="slider-row">
+      <label data-i18n="set_rotation"></label>
+      <input type="range" id="rotation" min="-60" max="0" value="-30">
+      <span class="value" id="rotationVal">-30°</span>
+    </div>
+    <div class="slider-row">
+      <label data-i18n="set_spacing"></label>
+      <input type="range" id="spacing" min="100" max="500" value="220">
+      <span class="value" id="spacingVal">220</span>
+    </div>
+    <div class="slider-row">
+      <label data-i18n="set_payload"></label>
+      <input type="text" id="payloadInput" class="text-input" data-i18n-placeholder="set_payload_hint">
     </div>
   </div>
-  <div class="slider-row">
-    <label data-i18n="set_size"></label>
-    <input type="range" id="logoSize" min="5" max="40" value="15">
-    <span class="value" id="logoSizeVal">15%</span>
-  </div>
-  <div class="slider-row">
-    <label data-i18n="set_opacity"></label>
-    <input type="range" id="opacity" min="10" max="80" value="35">
-    <span class="value" id="opacityVal">35%</span>
-  </div>
-  <div class="slider-row">
-    <label data-i18n="set_rotation"></label>
-    <input type="range" id="rotation" min="-60" max="0" value="-30">
-    <span class="value" id="rotationVal">-30°</span>
-  </div>
-  <div class="slider-row">
-    <label data-i18n="set_spacing"></label>
-    <input type="range" id="spacing" min="100" max="500" value="220">
-    <span class="value" id="spacingVal">220</span>
-  </div>
-  <div class="slider-row">
-    <label data-i18n="set_payload"></label>
-    <input type="text" id="payloadInput" class="text-input" data-i18n-placeholder="set_payload_hint">
-  </div>
-</div>
 
-<div class="card locked" id="cardResult">
-  <div class="card-head">
-    <div class="card-num">4</div>
-    <div>
-      <div class="card-title" data-i18n="result_title"></div>
-      <div class="card-hint" data-i18n="result_hint"></div>
+  <div class="card locked" id="cardResult">
+    <div class="card-head">
+      <div class="card-num">4</div>
+      <div>
+        <div class="card-title" data-i18n="result_title"></div>
+        <div class="card-hint" data-i18n="result_hint"></div>
+      </div>
+    </div>
+    <div class="preview-wrap" id="previewWrap">
+      <div class="preview-label" data-i18n="result_preview"></div>
+      <img id="preview" alt="">
+    </div>
+    <div class="progress-bar" id="progressBar">
+      <div class="progress-fill" id="progressFill"></div>
     </div>
   </div>
-  <div class="preview-wrap" id="previewWrap">
-    <div class="preview-label" data-i18n="result_preview"></div>
-    <img id="preview" alt="">
+
+  <div class="action-bar" id="actionBar">
+    <div class="action-bar-inner">
+      <button class="btn btn-secondary" id="resetBtn" data-i18n="result_reset"></button>
+      <button class="btn btn-primary" id="downloadZipBtn" data-i18n="result_download"></button>
+    </div>
   </div>
-  <div class="progress-bar" id="progressBar">
-    <div class="progress-fill" id="progressFill"></div>
+
+  <div class="status" id="status"></div>
+
+  <div class="notice">
+    <strong data-i18n="notice_strong"></strong>
+    <span data-i18n="notice_text"></span>
   </div>
+
+  <footer>
+    <span data-i18n="footer_text"></span>
+    <a href="https://github.com/keyzerphotos/OpenWatermark">GitHub</a><br>
+    <span data-i18n="footer_privacy"></span>
+  </footer>
+
 </div>
-
-<div class="action-bar" id="actionBar">
-  <div class="action-bar-inner">
-    <button class="btn btn-secondary" id="resetBtn" data-i18n="result_reset"></button>
-    <button class="btn btn-primary" id="downloadZipBtn" data-i18n="result_download"></button>
-  </div>
-</div>
-
-<div class="status" id="status"></div>
-
-<div class="notice">
-  <strong data-i18n="notice_strong"></strong>
-  <span data-i18n="notice_text"></span>
-</div>
-
-<footer>
-  <span data-i18n="footer_text"></span>
-  <a href="https://github.com/keyzerphotos/OpenWatermark">GitHub</a><br>
-  <span data-i18n="footer_privacy"></span>
-</footer>
 
 <script src="invisible-watermark.js"></script>
 <script src="app.js"></script>
