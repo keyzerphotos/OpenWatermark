@@ -1,7 +1,6 @@
 /* OpenWatermark - app.js
  * Versie 2.3.0 - MIT-licentie
  * Lightroom-stijl. Alleen Nederlands. Dubbelklik slider = reset.
- * Twee info-knoppen: rondje rechtsboven + tekst-link in footer.
  */
 (function () {
   'use strict';
@@ -183,7 +182,6 @@
   let wmMode = 'text';
   let textColor = 'white';
 
-  // ---------- OPSLAG ----------
   function safeGet(key) {
     try { return localStorage.getItem(key); } catch (e) { return null; }
   }
@@ -240,7 +238,6 @@
     }
   }
 
-  // ---------- UI-FLOW ----------
   function setStep(stepNum) {
     steps.forEach(s => {
       const n = parseInt(s.dataset.step, 10);
@@ -321,7 +318,6 @@
     statusEl.className = 'status' + (type ? ' ' + type : '');
   }
 
-  // ---------- MODUS ----------
   function setWmMode(mode) {
     wmMode = mode;
     saveWmMode(mode);
@@ -342,7 +338,6 @@
     });
   }
 
-  // ---------- KLEUR ----------
   function setTextColor(color) {
     textColor = color;
     saveTextColor(color);
@@ -360,7 +355,6 @@
     });
   }
 
-  // ---------- PRESETS ----------
   if (presetRow) {
     presetRow.querySelectorAll('.preset-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -372,7 +366,6 @@
     });
   }
 
-  // ---------- INFO (twee knoppen) ----------
   function openInfo() {
     if (infoOverlay) infoOverlay.classList.add('visible');
   }
@@ -387,7 +380,6 @@
     });
   }
 
-  // ---------- FOTO'S ----------
   if (photoZone && photoInput) {
     photoZone.addEventListener('click', () => photoInput.click());
     photoInput.addEventListener('change', (e) => addPhotos(e.target.files));
@@ -464,7 +456,6 @@
     photoList.appendChild(frag);
   }
 
-  // ---------- TEKST ----------
   if (wmText) {
     wmText.addEventListener('input', () => {
       saveText(wmText.value);
@@ -473,7 +464,6 @@
     });
   }
 
-  // ---------- LOGO ----------
   if (logoZone && logoInput) {
     logoZone.addEventListener('click', () => logoInput.click());
     logoInput.addEventListener('change', (e) => {
@@ -538,7 +528,6 @@
     img.src = stored.dataUrl;
   }
 
-  // ---------- SLIDERS ----------
   function bindSlider(el, valEl, suffix) {
     if (!el || !valEl) return;
 
@@ -579,7 +568,6 @@
     previewTimer = setTimeout(generatePreview, 150);
   }
 
-  // ---------- HELPERS ----------
   function loadImage(file) {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -621,7 +609,6 @@
     return canvas;
   }
 
-  // ---------- WATERMERK ----------
   async function applyWatermark(baseImg) {
     const preset = PRESETS[currentPreset];
 
@@ -691,7 +678,6 @@
     return visibleBlob;
   }
 
-  // ---------- PREVIEW ----------
   function revokePreviewUrl() {
     if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
   }
@@ -713,7 +699,6 @@
     }
   }
 
-  // ---------- DOWNLOAD ----------
   if (downloadBtn) {
     downloadBtn.addEventListener('click', async () => {
       if (busy) return;
@@ -800,7 +785,6 @@
     });
   }
 
-  // ---------- RESET ----------
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
       photos = [];
@@ -816,14 +800,12 @@
     });
   }
 
-  // ---------- PAYLOAD ----------
   if (payloadInput) {
     payloadInput.addEventListener('input', () => {
       savePayload(payloadInput.value);
     });
   }
 
-  // ---------- INIT ----------
   applyTranslations();
 
   const savedPayload = loadPayloadValue();
