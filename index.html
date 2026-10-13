@@ -23,6 +23,8 @@
     --accent-dim: #b8860b;
     --accent-glow: rgba(240, 180, 41, 0.15);
     --success: #34d399;
+    --success-glow: rgba(52, 211, 153, 0.25);
+    --warning: #fbbf24;
     --danger: #f87171;
     --radius: 14px;
     --radius-sm: 10px;
@@ -53,7 +55,6 @@
     overflow-x: hidden;
   }
 
-  /* De wrapper regelt de layout, niet de body */
   .wrapper {
     max-width: 720px;
     margin: 0 auto;
@@ -270,9 +271,12 @@
     text-overflow: ellipsis; white-space: nowrap;
   }
   .photo-item .remove {
-    color: var(--text-muted); cursor: pointer;
-    padding: 6px 8px; font-size: 1rem;
-    border-radius: 6px; transition: all 0.15s;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px 8px;
+    font-size: 1rem;
+    border-radius: 6px;
+    transition: all 0.15s;
     min-width: 34px; min-height: 34px;
     display: flex; align-items: center; justify-content: center;
   }
@@ -280,6 +284,20 @@
     background: rgba(248, 113, 113, 0.15);
     color: var(--danger);
   }
+
+  /* Foto-teller */
+  .photo-counter {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-top: 8px;
+    text-align: center;
+    padding: 6px 10px;
+    background: var(--surface-2);
+    border-radius: 8px;
+    display: none;
+  }
+  .photo-counter.visible { display: block; }
+  .photo-counter strong { color: var(--accent); }
 
   /* ---------- Logo ---------- */
   .logo-row {
@@ -374,6 +392,13 @@
     outline: none;
     border-color: var(--accent);
   }
+  .field-hint {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-top: 6px;
+    padding-left: 2px;
+  }
 
   /* ---------- Preview ---------- */
   .preview-wrap {
@@ -393,6 +418,15 @@
     letter-spacing: 0.06em;
     font-weight: 600;
   }
+  .preview-empty {
+    padding: 32px 16px;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    display: block;
+  }
+  .preview-empty.hidden { display: none; }
 
   /* ---------- Buttons ---------- */
   .btn {
@@ -407,10 +441,11 @@
     font-weight: 700;
     cursor: pointer;
     font-family: inherit;
-    transition: all 0.15s;
+    transition: all 0.2s;
     width: 100%;
     min-height: 50px;
     letter-spacing: -0.01em;
+    position: relative;
   }
   .btn:active { transform: scale(0.985); }
   .btn:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -418,6 +453,10 @@
     background: linear-gradient(135deg, var(--accent-hi), var(--accent-dim));
     color: #08080a;
     box-shadow: 0 4px 20px var(--accent-glow);
+  }
+  .btn-primary.success-flash {
+    background: linear-gradient(135deg, var(--success), #059669);
+    box-shadow: 0 4px 20px var(--success-glow);
   }
   .btn-secondary {
     background: var(--surface-2);
@@ -433,7 +472,7 @@
     flex-shrink: 0;
   }
 
-  /* ---------- Actiebalk (in-flow) ---------- */
+  /* ---------- Actiebalk ---------- */
   .action-bar {
     display: none;
     margin-top: 20px;
@@ -457,6 +496,7 @@
   }
   .status.success { color: var(--success); font-weight: 600; }
   .status.error { color: var(--danger); font-weight: 600; }
+  .status.warning { color: var(--warning); font-weight: 600; }
 
   /* ---------- Progress ---------- */
   .progress-bar {
@@ -489,6 +529,20 @@
     margin-top: 20px;
   }
   .notice strong { color: var(--accent); font-weight: 700; }
+
+  /* ---------- Waarschuwing ---------- */
+  .alert {
+    display: none;
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.74rem;
+    color: var(--warning);
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+  .alert.visible { display: block; }
 
   /* ---------- Footer ---------- */
   footer {
@@ -558,6 +612,10 @@
     </div>
   </div>
 
+  <!-- Waarschuwing als onzichtbare laag niet geladen is -->
+  <div class="alert" id="invisibleAlert" data-i18n="invisible_alert"></div>
+
+  <!-- Stap 1: Foto's -->
   <div class="card" id="cardPhotos">
     <div class="card-head">
       <div class="card-num">1</div>
@@ -573,8 +631,10 @@
       <input type="file" id="photoInput" accept="image/*" multiple hidden>
     </div>
     <div class="photo-list" id="photoList"></div>
+    <div class="photo-counter" id="photoCounter"></div>
   </div>
 
+  <!-- Stap 2: Logo -->
   <div class="card locked" id="cardLogo">
     <div class="card-head">
       <div class="card-num">2</div>
@@ -601,6 +661,7 @@
     </div>
   </div>
 
+  <!-- Stap 3: Instellingen -->
   <div class="card locked" id="cardSettings">
     <div class="card-head">
       <div class="card-num">3</div>
@@ -629,12 +690,14 @@
       <input type="range" id="spacing" min="100" max="500" value="220">
       <span class="value" id="spacingVal">220</span>
     </div>
-    <div class="slider-row">
+    <div class="slider-row" style="flex-wrap: wrap;">
       <label data-i18n="set_payload"></label>
       <input type="text" id="payloadInput" class="text-input" data-i18n-placeholder="set_payload_hint">
+      <div class="field-hint" data-i18n="set_payload_help" style="flex-basis: 100%;"></div>
     </div>
   </div>
 
+  <!-- Stap 4: Resultaat -->
   <div class="card locked" id="cardResult">
     <div class="card-head">
       <div class="card-num">4</div>
@@ -645,13 +708,15 @@
     </div>
     <div class="preview-wrap" id="previewWrap">
       <div class="preview-label" data-i18n="result_preview"></div>
-      <img id="preview" alt="">
+      <img id="preview" alt="" style="display:none;">
+      <div class="preview-empty" id="previewEmpty" data-i18n="result_empty"></div>
     </div>
     <div class="progress-bar" id="progressBar">
       <div class="progress-fill" id="progressFill"></div>
     </div>
   </div>
 
+  <!-- Actiebalk -->
   <div class="action-bar" id="actionBar">
     <div class="action-bar-inner">
       <button class="btn btn-secondary" id="resetBtn" data-i18n="result_reset"></button>
