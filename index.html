@@ -2,905 +2,414 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OpenWatermark — Bescherm je foto's</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#08080a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>OpenWatermark</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23f0b429'/%3E%3Ctext x='50' y='68' font-family='sans-serif' font-size='54' font-weight='800' text-anchor='middle' fill='%2308080a'%3EOW%3C/text%3E%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.2/dist/jszip.min.js"></script>
 <style>
   :root {
-    --bg: #0a0a0a;
-    --surface: #141414;
-    --surface-2: #1c1c1c;
-    --border: #262626;
-    --text: #ededed;
-    --text-dim: #8a8a8a;
+    --bg: #08080a;
+    --surface: #111114;
+    --surface-2: #17171c;
+    --surface-3: #1f1f26;
+    --border: #26262e;
+    --text: #f2f2f5;
+    --text-dim: #8a8a96;
+    --text-muted: #5a5a66;
     --accent: #f0b429;
+    --accent-hi: #ffc94a;
     --accent-dim: #b8860b;
-    --danger: #e5484d;
-    --success: #30a46c;
+    --accent-glow: rgba(240, 180, 41, 0.15);
+    --success: #34d399;
+    --success-glow: rgba(52, 211, 153, 0.25);
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body {
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    background: var(--bg);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
     background: var(--bg);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
-    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
+    margin: 0;
+    min-height: 100vh;
   }
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px 16px 60px;
+
+  .wrapper {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: calc(24px + var(--safe-top)) 16px calc(60px + var(--safe-bottom));
   }
 
   header {
-    width: 100%; max-width: 780px;
-    margin-bottom: 28px; text-align: center;
+    text-align: center;
+    margin-bottom: 28px;
   }
   .logo {
-    display: inline-flex; align-items: center;
-    gap: 10px; margin-bottom: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
   }
   .logo-mark {
-    width: 36px; height: 36px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-dim));
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 18px; color: #0a0a0a;
-    box-shadow: 0 4px 16px rgba(240, 180, 41, 0.2);
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, var(--accent-hi), var(--accent-dim));
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 17px;
+    color: #08080a;
+    box-shadow: 0 4px 20px var(--accent-glow);
+    letter-spacing: -0.02em;
   }
-  h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
   .subtitle {
-    font-size: 0.85rem; color: var(--text-dim);
-    line-height: 1.5; max-width: 500px; margin: 0 auto;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    line-height: 1.55;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+
+  .steps {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding: 0 8px;
+    position: relative;
+  }
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+  }
+  .step-dot {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    transition: all 0.25s;
+  }
+  .step-label {
+    font-size: 0.62rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    transition: color 0.25s;
+  }
+  .step.active .step-dot {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #08080a;
+    box-shadow: 0 0 0 4px var(--accent-glow);
+  }
+  .step.active .step-label { color: var(--accent); }
+  .step.done .step-dot {
+    background: var(--success);
+    border-color: var(--success);
+    color: #08080a;
+  }
+  .step.done .step-label { color: var(--success); }
+  .steps::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: var(--border);
+    z-index: 1;
   }
 
   .card {
-    width: 100%; max-width: 780px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px; margin-bottom: 16px;
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 14px;
+    transition: border-color 0.25s, opacity 0.25s;
+  }
+  .card.locked {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .card.done {
+    border-color: rgba(52, 211, 153, 0.3);
+  }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .card-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: var(--surface-3);
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .card.done .card-num {
+    background: var(--success);
+    color: #08080a;
   }
   .card-title {
-    font-size: 0.75rem; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--text-dim); margin-bottom: 14px;
-    display: flex; align-items: center; gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
   }
-  .card-title::before {
-    content: ''; width: 4px; height: 14px;
-    background: var(--accent); border-radius: 2px;
+  .card-hint {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+    font-weight: 500;
   }
 
   .drop-zone {
     border: 2px dashed var(--border);
-    border-radius: 12px;
-    padding: 28px 20px; text-align: center;
-    cursor: pointer; transition: all 0.2s;
+    border-radius: var(--radius-sm);
+    padding: 32px 20px;
+    text-align: center;
+    cursor: pointer;
     background: var(--surface-2);
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 120px;
   }
-  .drop-zone:hover, .drop-zone.dragover {
+  .drop-zone:active {
     border-color: var(--accent);
-    background: rgba(240, 180, 41, 0.04);
+    background: rgba(240, 180, 41, 0.05);
   }
-  .drop-zone .icon { font-size: 1.6rem; margin-bottom: 8px; opacity: 0.7; }
-  .drop-zone .label { font-size: 0.9rem; font-weight: 500; margin-bottom: 4px; }
-  .drop-zone .hint { font-size: 0.75rem; color: var(--text-dim); }
+  .drop-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(240, 180, 41, 0.08);
+  }
+  .drop-icon { font-size: 1.8rem; opacity: 0.8; }
+  .drop-label { font-size: 0.92rem; font-weight: 600; }
+  .drop-hint { font-size: 0.72rem; color: var(--text-muted); }
 
   .photo-list {
-    margin-top: 14px; max-height: 240px;
-    overflow-y: auto; display: none;
+    margin-top: 12px;
+    max-height: 240px;
+    overflow-y: auto;
+    display: none;
   }
   .photo-list.visible { display: block; }
   .photo-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 10px; background: var(--surface-2);
-    border-radius: 8px; margin-bottom: 6px; font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: var(--surface-2);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
   }
   .photo-item .thumb {
-    width: 36px; height: 36px; border-radius: 6px;
-    object-fit: cover; background: #000; flex-shrink: 0;
+    width: 36px; height: 36px;
+    border-radius: 6px; object-fit: cover;
+    background: #000; flex-shrink: 0;
   }
   .photo-item .name {
-    flex: 1; overflow: hidden; text-overflow: ellipsis;
-    white-space: nowrap;
+    flex: 1; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
   }
   .photo-item .remove {
-    color: var(--text-dim); cursor: pointer;
-    padding: 4px 8px; font-size: 1rem; line-height: 1;
-  }
-  .photo-item .remove:hover { color: var(--danger); }
-
-  .logo-mode {
-    display: flex; gap: 6px; margin-bottom: 14px;
-  }
-  .logo-mode button {
-    flex: 1; padding: 10px 12px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    border-radius: 8px;
-    font-size: 0.8rem; font-weight: 500;
-    cursor: pointer; font-family: inherit;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px 8px;
+    font-size: 1rem;
+    border-radius: 6px;
     transition: all 0.15s;
+    min-width: 34px; min-height: 34px;
+    display: flex; align-items: center; justify-content: center;
   }
-  .logo-mode button.active {
-    background: rgba(240, 180, 41, 0.12);
-    border-color: var(--accent); color: var(--accent);
-    font-weight: 600;
-  }
-
-  .text-logo-row {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px; background: var(--surface-2);
-    border-radius: 10px; margin-bottom: 10px;
-  }
-  .text-logo-row input {
-    flex: 1; padding: 10px 12px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    font-size: 0.9rem; font-family: inherit;
-  }
-  .text-logo-row input:focus {
-    outline: none; border-color: var(--accent);
+  .photo-item .remove:active {
+    background: rgba(248, 113, 113, 0.15);
+    color: var(--danger);
   }
 
-  .text-preview {
-    padding: 20px;
-    background: repeating-conic-gradient(#2a2a2a 0% 25%, #1c1c1c 0% 50%) 50% / 16px 16px;
-    border-radius: 10px;
+  .photo-counter {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-top: 8px;
     text-align: center;
-    margin-bottom: 10px;
-    border: 1px solid var(--border);
+    padding: 6px 10px;
+    background: var(--surface-2);
+    border-radius: 8px;
+    display: none;
   }
-  .text-preview .sample {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #fff;
-    opacity: 0.75;
-    letter-spacing: 0.02em;
-  }
+  .photo-counter.visible { display: block; }
+  .photo-counter strong { color: var(--accent); }
 
   .logo-row {
     display: flex; align-items: center; gap: 14px;
-    padding: 10px; background: var(--surface-2);
-    border-radius: 10px;
+    padding: 12px;
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
   }
   .logo-thumb {
     width: 56px; height: 56px; object-fit: contain;
-    background: repeating-conic-gradient(#2a2a2a 0% 25%, #1c1c1c 0% 50%) 50% / 12px 12px;
+    background: repeating-conic-gradient(#1f1f26 0% 25%, #17171c 0% 50%) 50% / 12px 12px;
     border-radius: 8px; border: 1px solid var(--border);
     padding: 4px; flex-shrink: 0;
   }
-  .logo-info { flex: 1; font-size: 0.8rem; }
-  .logo-info .name { font-weight: 500; margin-bottom: 2px; }
-  .logo-info .meta { color: var(--text-dim); font-size: 0.72rem; }
+  .logo-info { flex: 1; min-width: 0; font-size: 0.8rem; }
+  .logo-info .name {
+    font-weight: 600; margin-bottom: 2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .logo-info .meta { color: var(--text-muted); font-size: 0.7rem; }
+  .logo-info .meta.saved { color: var(--accent); }
 
-  .controls { display: none; }
-  .controls.visible { display: block; }
+  .logo-saved-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(240, 180, 41, 0.12);
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-top: 4px;
+  }
+
   .slider-row {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 0; border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
   }
   .slider-row:last-child { border-bottom: none; }
   .slider-row label {
-    font-size: 0.8rem; color: var(--text-dim);
-    min-width: 120px; flex-shrink: 0;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    min-width: 100px;
+    font-weight: 500;
+    flex-shrink: 0;
   }
   .slider-row input[type="range"] {
-    flex: 1; -webkit-appearance: none; appearance: none;
-    height: 4px; background: var(--border);
-    border-radius: 2px; outline: none;
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    min-width: 0;
+    touch-action: pan-y;
   }
   .slider-row input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none; appearance: none;
-    width: 18px; height: 18px; background: var(--accent);
-    border-radius: 50%; cursor: pointer;
-    box-shadow: 0 2px 8px rgba(240, 180, 41, 0.3);
+    -webkit-appearance: none;
+    appearance: none;
+    width: 28px;
+    height: 28px;
+    background: var(--accent);
+    border-radius: 50%;
+    border: 2px solid var(--surface);
+    box-shadow: 0 2px 8px var(--accent-glow);
+    cursor: pointer;
   }
   .slider-row input[type="range"]::-moz-range-thumb {
-    width: 18px; height: 18px; background: var(--accent);
-    border-radius: 50%; cursor: pointer; border: none;
+    width: 28px;
+    height: 28px;
+    background: var(--accent);
+    border-radius: 50%;
+    border: 2px solid var(--surface);
+    cursor: pointer;
   }
   .slider-row .value {
-    font-size: 0.78rem; color: var(--accent);
-    min-width: 52px; text-align: right;
-    font-variant-numeric: tabular-nums; font-weight: 600;
-  }
-
-  .select-row {
-    padding: 10px 0; border-bottom: 1px solid var(--border);
-  }
-  .select-row:last-child { border-bottom: none; }
-  .select-row > label {
-    display: block; font-size: 0.8rem; color: var(--text-dim);
-    margin-bottom: 8px;
-  }
-  .segmented { display: flex; gap: 6px; flex-wrap: wrap; }
-  .segmented button {
-    flex: 1; min-width: 70px;
-    padding: 10px 12px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    border-radius: 8px;
-    font-size: 0.78rem; font-weight: 500;
-    cursor: pointer; font-family: inherit;
-    transition: all 0.15s;
-  }
-  .segmented button.active {
-    background: rgba(240, 180, 41, 0.12);
-    border-color: var(--accent); color: var(--accent);
-    font-weight: 600;
-  }
-  .segmented button:hover:not(.active) {
-    border-color: #333; color: var(--text);
+    font-size: 0.75rem;
+    color: var(--accent);
+    min-width: 46px;
+    text-align: right;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
   }
 
   .text-input {
-    width: 100%; padding: 10px 12px;
+    flex: 1;
+    padding: 10px 14px;
     background: var(--surface-2);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    font-size: 0.85rem; font-family: inherit;
-  }
-  .text-input:focus { outline: none; border-color: var(--accent); }
-
-  .color-row {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 0;
-  }
-  .color-row label {
-    font-size: 0.8rem; color: var(--text-dim);
-    min-width: 120px; flex-shrink: 0;
-  }
-  .color-row input[type="color"] {
-    width: 44px; height: 32px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--surface-2);
-    cursor: pointer; padding: 2px;
-  }
-  .color-presets { display: flex; gap: 6px; }
-  .color-presets button {
-    width: 28px; height: 28px; border-radius: 50%;
-    border: 2px solid var(--border);
-    cursor: pointer; padding: 0;
-  }
-  .color-presets button:hover { border-color: var(--accent); }
-
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    gap: 8px; padding: 14px 20px;
-    border: none; border-radius: 12px;
-    font-size: 0.9rem; font-weight: 600;
-    cursor: pointer; transition: all 0.15s;
-    font-family: inherit; width: 100%;
-  }
-  .btn:active { transform: scale(0.98); }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent-dim));
-    color: #0a0a0a;
-    box-shadow: 0 4px 16px rgba(240, 180, 41, 0.25);
-  }
-  .btn-secondary {
-    background: var(--surface-2); color: var(--text);
-    border: 1px solid var(--border);
-  }
-  .btn-small {
-    padding: 8px 14px; font-size: 0.78rem;
-    width: auto; border-radius: 8px;
-  }
-  .btn-row { display: flex; gap: 10px; margin-top: 14px; }
-
-  .preview-wrap { display: none; margin-top: 14px; }
-  .preview-wrap.visible { display: block; }
-  .preview-wrap img {
-    width: 100%; border-radius: 10px;
-    border: 1px solid var(--border); display: block;
-  }
-  .compare-toggle { display: flex; gap: 6px; margin-bottom: 10px; }
-  .compare-toggle button {
-    flex: 1; padding: 8px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    border-radius: 8px;
-    font-size: 0.78rem; font-weight: 500;
-    cursor: pointer; font-family: inherit;
-  }
-  .compare-toggle button.active {
-    background: rgba(240, 180, 41, 0.12);
-    border-color: var(--accent); color: var(--accent);
-    font-weight: 600;
-  }
-
-  .status {
-    font-size: 0.8rem; color: var(--text-dim);
-    text-align: center; min-height: 1.4em;
-    margin: 16px 0; width: 100%; max-width: 780px;
-  }
-  .status.success { color: var(--success); }
-  .status.error { color: var(--danger); }
-
-  .progress-bar {
-    width: 100%; height: 4px;
-    background: var(--border);
-    border-radius: 2px; overflow: hidden;
-    margin-top: 10px; display: none;
-  }
-  .progress-bar.visible { display: block; }
-  .progress-fill {
-    height: 100%; background: var(--accent);
-    width: 0%; transition: width 0.2s;
-  }
-
-  .notice {
-    width: 100%; max-width: 780px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--accent);
     border-radius: 10px;
-    padding: 14px 16px;
-    font-size: 0.76rem; color: var(--text-dim);
-    line-height: 1.6; margin-top: 20px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.85rem;
+    transition: border-color 0.15s;
+    min-width: 0;
   }
-  .notice strong { color: var(--accent); font-weight: 600; }
+  .text-input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .field-hint {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-top: 6px;
+    padding-left: 2px;
+  }
 
-  footer {
-    margin-top: 32px; font-size: 0.72rem;
-    color: var(--text-dim); text-align: center; line-height: 1.6;
-  }
-  footer a { color: var(--accent); text-decoration: none; }
-
-  .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(4px);
-    display: none; align-items: center; justify-content: center;
-    z-index: 100; padding: 20px;
-  }
-  .modal-overlay.visible { display: flex; }
-  .modal {
-    background: var(--surface);
+  .field-details {
+    flex-basis: 100%;
+    margin-top: 10px;
+    background: var(--surface-2);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px;
-    max-width: 400px; width: 100%;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  }
-  .modal h3 { font-size: 1.1rem; margin-bottom: 8px; font-weight: 700; }
-  .modal p {
-    font-size: 0.85rem; color: var(--text-dim);
-    margin-bottom: 20px; line-height: 1.5;
-  }
-  .modal-buttons { display: flex; flex-direction: column; gap: 10px; }
-  .modal-buttons .btn { width: 100%; }
-
-  @media (max-width: 500px) {
-    .slider-row, .select-row > label, .color-row { font-size: 0.85rem; }
-    .slider-row label { min-width: 90px; }
-    .slider-row .value { min-width: 44px; }
-  }
-</style>
-</head>
-<body>
-
-<header>
-  <div class="logo">
-    <div class="logo-mark">OW</div>
-    <h1>OpenWatermark</h1>
-  </div>
-  <p class="subtitle">Bescherm je foto's met je eigen naam of logo. Alles lokaal in je browser — niets wordt geüpload.</p>
-</header>
-
-<!-- Foto's -->
-<div class="card">
-  <div class="card-title">Foto's</div>
-  <div class="drop-zone" id="photoZone">
-    <div class="icon">📷</div>
-    <div class="label">Sleep je foto's hierheen</div>
-    <div class="hint">of tik om te kiezen · meerdere foto's mogelijk</div>
-    <input type="file" id="photoInput" accept="image/*" multiple hidden>
-  </div>
-  <div class="photo-list" id="photoList"></div>
-</div>
-
-<!-- Watermerk-bron -->
-<div class="card">
-  <div class="card-title">Watermerk</div>
-
-  <div class="logo-mode" id="logoModeGroup">
-    <button data-value="text" class="active">✎ Tekst (© naam)</button>
-    <button data-value="image">🖼 Eigen logo</button>
-  </div>
-
-  <!-- Tekst-modus -->
-  <div id="textMode">
-    <div class="text-preview">
-      <div class="sample" id="textSample">© Jouw Naam</div>
-    </div>
-    <div class="text-logo-row">
-      <input type="text" id="wmText" placeholder="Bijv. © Jan Jansen 2026" value="© Jouw Naam">
-    </div>
-  </div>
-
-  <!-- Logo-modus -->
-  <div id="imageMode" style="display:none;">
-    <div class="drop-zone" id="logoZone">
-      <div class="icon">✦</div>
-      <div class="label">Sleep je logo hierheen</div>
-      <div class="hint">PNG met transparante achtergrond werkt het best</div>
-      <input type="file" id="logoInput" accept="image/png,image/svg+xml,image/webp" hidden>
-    </div>
-    <div id="logoInfoRow" style="display:none; margin-top:14px;">
-      <div class="logo-row">
-        <img id="logoThumb" class="logo-thumb" alt="">
-        <div class="logo-info">
-          <div class="name" id="logoName">logo.png</div>
-          <div class="meta">Klaar voor gebruik</div>
-        </div>
-        <button class="btn btn-secondary btn-small" id="changeLogoBtn">Wijzigen</button>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<!-- Instellingen -->
-<div class="card">
-  <div class="card-title">Instellingen</div>
-  <div class="controls visible" id="controls">
-
-    <div class="select-row">
-      <label>Positie</label>
-      <div class="segmented" id="positionGroup">
-        <button data-value="tile" class="active">Over hele foto</button>
-        <button data-value="center">Midden</button>
-        <button data-value="corner">Hoek</button>
-      </div>
-    </div>
-
-    <div class="slider-row">
-      <label>Grootte</label>
-      <input type="range" id="logoSize" min="5" max="40" value="15">
-      <span class="value" id="logoSizeVal">15%</span>
-    </div>
-
-    <div class="slider-row">
-      <label>Transparantie</label>
-      <input type="range" id="opacity" min="10" max="80" value="35">
-      <span class="value" id="opacityVal">35%</span>
-    </div>
-
-    <div class="slider-row">
-      <label>Rotatie</label>
-      <input type="range" id="rotation" min="-60" max="0" value="-30">
-      <span class="value" id="rotationVal">-30°</span>
-    </div>
-
-    <div class="slider-row">
-      <label>Afstand</label>
-      <input type="range" id="spacing" min="100" max="500" value="220">
-      <span class="value" id="spacingVal">220</span>
-    </div>
-
-    <div class="color-row">
-      <label>Kleur</label>
-      <input type="color" id="wmColor" value="#ffffff">
-      <div class="color-presets">
-        <button data-color="#ffffff" style="background:#ffffff" title="Wit"></button>
-        <button data-color="#000000" style="background:#000000" title="Zwart"></button>
-        <button data-color="#f0b429" style="background:#f0b429" title="Goud"></button>
-        <button data-color="#e5484d" style="background:#e5484d" title="Rood"></button>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- Uitvoer -->
-<div class="card">
-  <div class="card-title">Uitvoer</div>
-
-  <div class="select-row">
-    <label>Formaat</label>
-    <div class="segmented" id="formatGroup">
-      <button data-value="jpg" class="active">JPG</button>
-      <button data-value="png">PNG</button>
-    </div>
-  </div>
-
-  <div class="slider-row" id="qualityRow">
-    <label>JPG-kwaliteit</label>
-    <input type="range" id="quality" min="60" max="100" value="92">
-    <span class="value" id="qualityVal">92%</span>
-  </div>
-
-  <div class="select-row">
-    <label>Maximale breedte</label>
-    <div class="segmented" id="maxWidthGroup">
-      <button data-value="0" class="active">Origineel</button>
-      <button data-value="1920">1920 px</button>
-      <button data-value="1280">1280 px</button>
-      <button data-value="800">800 px</button>
-    </div>
-    <p style="font-size:0.72rem; color:var(--text-dim); margin-top:8px; line-height:1.5;">
-      Kleinere foto's zijn onbruikbaar voor drukwerk als iemand een screenshot maakt.
-    </p>
-  </div>
-
-  <div class="select-row">
-    <label>Bestandsnaam-suffix</label>
-    <input type="text" class="text-input" id="filenameSuffix" value="_watermerk" placeholder="Bijv. _watermerk">
-  </div>
-
-</div>
-
-<!-- Resultaat -->
-<div class="card" id="resultCard" style="display:none;">
-  <div class="card-title">Resultaat</div>
-
-  <div class="compare-toggle">
-    <button id="showResult" class="active">Resultaat</button>
-    <button id="showOriginal">Origineel</button>
-  </div>
-
-  <div class="preview-wrap visible" id="previewWrap">
-    <img id="preview" alt="Voorbeeld">
-  </div>
-
-  <div class="btn-row">
-    <button class="btn btn-primary" id="downloadBtn">⬇ Downloaden</button>
-  </div>
-  <div class="progress-bar" id="progressBar">
-    <div class="progress-fill" id="progressFill"></div>
-  </div>
-  <div class="btn-row">
-    <button class="btn btn-secondary" id="resetBtn">Alles wissen</button>
-  </div>
-</div>
-
-<div class="status" id="status"></div>
-
-<div class="notice">
-  <strong>Eerlijk:</strong> een zichtbaar watermerk maakt verwijdering lastiger, maar niet onmogelijk. Herhaling over de hele foto is moeilijker weg te poetsen dan één logo in een hoek. Voor echte herkomstbescherming is C2PA-metadata nodig — dat zit al in moderne camera's zoals Nikon Z9 en Canon R5 Mark II.
-</div>
-
-<footer>
-  OpenWatermark · Open source op <a href="https://github.com/keyzerphotos/OpenWatermark">GitHub</a><br>
-  Je foto's blijven op je toestel. Niets wordt verstuurd.
-</footer>
-
-<div class="modal-overlay" id="modal">
-  <div class="modal">
-    <h3>Hoe wil je downloaden?</h3>
-    <p id="modalText">Je hebt meerdere foto's. Kies hoe je ze wilt opslaan.</p>
-    <div class="modal-buttons">
-      <button class="btn btn-primary" id="modalZip">Als ZIP-bestand</button>
-      <button class="btn btn-secondary" id="modalLoose">Losse bestanden</button>
-      <button class="btn btn-secondary" id="modalCancel" style="background:transparent; border:none; color:var(--text-dim);">Annuleren</button>
-    </div>
-  </div>
-</div>
-
-<script>
-(function() {
-  'use strict';
-
-  // ---------- Elementen ----------
-  const photoZone = document.getElementById('photoZone');
-  const photoInput = document.getElementById('photoInput');
-  const photoList = document.getElementById('photoList');
-  const logoZone = document.getElementById('logoZone');
-  const logoInput = document.getElementById('logoInput');
-  const logoInfoRow = document.getElementById('logoInfoRow');
-  const logoThumb = document.getElementById('logoThumb');
-  const logoName = document.getElementById('logoName');
-  const changeLogoBtn = document.getElementById('changeLogoBtn');
-  const controls = document.getElementById('controls');
-  const resultCard = document.getElementById('resultCard');
-  const preview = document.getElementById('preview');
-  const statusEl = document.getElementById('status');
-  const downloadBtn = document.getElementById('downloadBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const progressBar = document.getElementById('progressBar');
-  const progressFill = document.getElementById('progressFill');
-  const modal = document.getElementById('modal');
-  const modalText = document.getElementById('modalTround: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(4px);
-    display: none;
-    align-items: center; justify-content: center;
-    z-index: 100; padding: 20px;
-  }
-  .modal-overlay.visible { display: flex; }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px;
-    max-width: 400px; width: 100%;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  }
-  .modal h3 {
-    font-size: 1.1rem; margin-bottom: 8px;
-    font-weight: 700;
-  }
-  .modal p {
-    font-size: 0.85rem; color: var(--text-dim);
-    margin-bottom: 20px; line-height: 1.5;
-  }
-  .modal-buttons {
-    display: flex; flex-direction: column; gap: 10px;
-  }
-  .modal-buttons .btn { width: 100%; }
-
-  @media (max-width: 500px) {
-    .slider-row, .select-row > label, .color-row { font-size: 0.85rem; }
-    .slider-row label { min-width: 90px; }
-    .slider-row .value { min-width: 44px; }
-  }
-</style>
-</head>
-<body>
-
-<header>
-  <div class="logo">
-    <div class="logo-mark">OW</div>
-    <h1>OpenWatermark</h1>
-  </div>
-  <p class="subtitle">Bescherm je foto's met je eigen logo. Alles lokaal in je browser — niets wordt geüpload.</p>
-</header>
-
-<!-- Foto's -->
-<div class="card">
-  <div class="card-title">Foto's</div>
-  <div class="drop-zone" id="photoZone">
-    <div class="icon">📷</div>
-    <div class="label">Sleep je foto's hierheen</div>
-    <div class="hint">of tik om te kiezen · meerdere foto's mogelijk</div>
-    <input type="file" id="photoInput" accept="image/*" multiple hidden>
-  </div>
-  <div class="photo-list" id="photoList"></div>
-</div>
-
-<!-- Logo -->
-<div class="card">
-  <div class="card-title">Jouw logo</div>
-  <div class="drop-zone" id="logoZone">
-    <div class="icon">✦</div>
-    <div class="label">Sleep je logo hierheen</div>
-    <div class="hint">PNG met transparante achtergrond werkt het best</div>
-    <input type="file" id="logoInput" accept="image/png,image/svg+xml,image/webp" hidden>
-  </div>
-  <div id="logoInfoRow" style="display:none; margin-top:14px;">
-    <div class="logo-row">
-      <img id="logoThumb" class="logo-thumb" alt="">
-      <div class="logo-info">
-        <div class="name" id="logoName">logo.png</div>
-        <div class="meta">Klaar voor gebruik</div>
-      </div>
-      <button class="btn btn-secondary btn-small" id="changeLogoBtn">Wijzigen</button>
-    </div>
-  </div>
-</div>
-
-<!-- Watermerk instellingen -->
-<div class="card">
-  <div class="card-title">Watermerk</div>
-  <div class="controls visible" id="controls">
-
-    <div class="select-row">
-      <label>Positie</label>
-      <div class="segmented" id="positionGroup">
-        <button data-value="tile" class="active">Over hele foto</button>
-        <button data-value="center">Midden</button>
-        <button data-value="corner">Hoek</button>
-      </div>
-    </div>
-
-    <div class="slider-row">
-      <label>Logogrootte</label>
-      <input type="range" id="logoSize" min="5" max="40" value="15">
-      <span class="value" id="logoSizeVal">15%</span>
-    </div>
-
-    <div class="slider-row">
-      <label>Transparantie</label>
-      <input type="range" id="opacity" min="10" max="80" value="35">
-      <span class="value" id="opacityVal">35%</span>
-    </div>
-
-    <div class="slider-row">
-      <label>Rotatie</label>
-      <input type="range" id="rotation" min="-60" max="0" value="-30">
-      <span class="value" id="rotationVal">-30°</span>
-    </div>
-
-    <div class="slider-row">
-      <label>Afstand</label>
-      <input type="range" id="spacing" min="100" max="500" value="220">
-      <span class="value" id="spacingVal">220</span>
-    </div>
-
-    <div class="color-row">
-      <label>Kleur</label>
-      <input type="color" id="wmColor" value="#ffffff">
-      <div class="color-presets">
-        <button data-color="#ffffff" style="background:#ffffff" title="Wit"></button>
-        <button data-color="#000000" style="background:#000000" title="Zwart"></button>
-        <button data-color="#f0b429" style="background:#f0b429" title="Goud"></button>
-        <button data-color="#e5484d" style="background:#e5484d" title="Rood"></button>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- Uitvoer instellingen -->
-<div class="card">
-  <div class="card-title">Uitvoer</div>
-
-  <div class="select-row">
-    <label>Formaat</label>
-    <div class="segmented" id="formatGroup">
-      <button data-value="jpg" class="active">JPG</button>
-      <button data-value="png">PNG</button>
-    </div>
-  </div>
-
-  <div class="slider-row" id="qualityRow">
-    <label>JPG-kwaliteit</label>
-    <input type="range" id="quality" min="60" max="100" value="92">
-    <span class="value" id="qualityVal">92%</span>
-  </div>
-
-  <div class="select-row">
-    <label>Maximale breedte</label>
-    <div class="segmented" id="maxWidthGroup">
-      <button data-value="0" class="active">Origineel</button>
-      <button data-value="1920">1920 px</button>
-      <button data-value="1280">1280 px</button>
-      <button data-value="800">800 px</button>
-    </div>
-    <p style="font-size:0.72rem; color:var(--text-dim); margin-top:8px; line-height:1.5;">
-      Kleinere foto's zijn onbruikbaar voor drukwerk als iemand een screenshot maakt.
-    </p>
-  </div>
-
-  <div class="select-row">
-    <label>Bestandsnaam</label>
-    <input type="text" class="text-input" id="filenameSuffix" value="_watermerk" placeholder="Bijv. _watermerk of _jouwnaam">
-  </div>
-
-</div>
-
-<!-- Resultaat -->
-<div class="card" id="resultCard" style="display:none;">
-  <div class="card-title">Resultaat</div>
-
-  <div class="compare-toggle">
-    <button id="showResult" class="active">Resultaat</button>
-    <button id="showOriginal">Origineel</button>
-  </div>
-
-  <div class="preview-wrap visible" id="previewWrap">
-    <img id="preview" alt="Voorbeeld">
-  </div>
-
-  <div class="btn-row">
-    <button class="btn btn-primary" id="downloadBtn">⬇ Downloaden</button>
-  </div>
-  <div class="progress-bar" id="progressBar">
-    <div class="progress-fill" id="progressFill"></div>
-  </div>
-  <div class="btn-row">
-    <button class="btn btn-secondary" id="resetBtn">Alles wissen</button>
-  </div>
-</div>
-
-<div class="status" id="status"></div>
-
-<div class="notice">
-  <strong>Eerlijk:</strong> een zichtbaar watermerk maakt verwijdering lastiger, maar niet onmogelijk. Herhaling over de hele foto is moeilijker weg te poetsen dan één logo in een hoek. Voor echte herkomstbescherming is C2PA-metadata nodig — dat zit al in moderne camera's zoals Nikon Z9 en Canon R5 Mark II.
-</div>
-
-<footer>
-  OpenWatermark · Open source op <a href="https://github.com/keyzerphotos/OpenWatermark">GitHub</a><br>
-  Je foto's blijven op je toestel. Niets wordt verstuurd.
-</footer>
-
-<!-- Modal -->
-<div class="modal-overlay" id="modal">
-  <div class="modal">
-    <h3>Hoe wil je downloaden?</h3>
-    <p id="modalText">Je hebt meerdere foto's. Kies hoe je ze wilt opslaan.</p>
-    <div class="modal-buttons">
-      <button class="btn btn-primary" id="modalZip">Als ZIP-bestand</button>
-      <button class="btn btn-secondary" id="modalLoose">Losse bestanden</button>
-      <button class="btn btn-secondary" id="modalCancel" style="background:transparent; border:none; color:var(--text-dim);">Annuleren</button>
-    </div>
-  </div>
-</div>
-
-<script>
-(function() {
-  'use strict';
-
-  // ---------- Elementen ----------
-  const photoZone = document.getElementById('photoZone');
-  const photoInput = document.getElementById('photoInput');
-  const photoList = document.getElementById('photoList');
-  const logoZone = document.getElementById('logoZone');
-  const logoInput = document.getElementById('logoInput');
-  const logoInfoRow = document.getElementById('logoInfoRow');
-  const logoThumb = document.getElementById('logoThumb');
-  const logoName = document.getElementById('logoName');
-  const changeLogoBtn = document.getElementById('changeLogoBtn');
-  const controls = document.getElementById('controls');
-  const resultCard = document.getElementById('resultCard');
-  const preview = document.getElementById('preview');
-  const statusEl = document.getElementById('status');
-  const downloadBtn = document.getElementById('downloadBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const progressBar = document.getElementById('progressBar');
-  const progressFill = document.getElementById('progressFill');
-  const modal = document.getElementById('modal');
-  const modalText = document.getElementById('modalText');
-  const showResult = document.getElementById('showResult');
-  const showOriginal = document.getElementById('showOriginal');
-
-  const logoSize = document.getElementById('logoSize');
-  const opacity = document.getElementById('opacity');
-  const rotation = document.getElementById('rotation');
-  const spacing = document.getElementById('spacing');
-  const quality = document.getElementById('quality');
-  const qualityRow = document.getElementById('qualityRow');
-  const wmColor = document.getElementById('wmColor');
-  const filenameSuffix = document.getElementById('filenameSuffix');
-
-  let photos = [];
-  let logoImage = null;
-  let logoFile = null;
-  let previewBlob = null;
-  let originalPreviewBlob = null;
-  let positionMode = 'tile';
-  let formatMode = 'jpg';
-  let maxWidth = 0;
-
-  // ---------- Instellingen laden/opslaan ----------
-  const SETTINGS_KEY = 'openwatermark_settings';
-
-  function saveSettings() {
-    try {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify({
-        logoSize: logoSize.value,
-        opacity: opacity.value,
-        rotation: rotation.value,
-        spacing: spacing.value,
-        quality: quality.value,
-        color: wmColor.value,
-        suffix: filenameSuffix.value,
-        position: positionMode,
-        format: formatMode,
-        maxWidth: maxWidth,
-      }));
-    } catch (e) {}
-  }
-
-  function loadSettings() {
-    try {
-      const raw = localStorage.getItem(SETTINGS_KEY);
-      if (!raw) return;
-      const s = JSON.parse(raw);
-      if (s.logoSize) logoSize.value = s.logoSize;
-      if (s.opacity) opacity.value = s.opacity;
-      if (s.rotation) ren;
+    border-radius: 10px;
+    overflow: hidden;
   }
   .field-details summary {
     padding: 10px 14px;
@@ -921,7 +430,7 @@
     color: var(--text-dim);
   }
   .field-details[open] summary::after {
-    content: '−';
+    content: '-';
   }
   .field-details-body {
     padding: 0 14px 14px;
