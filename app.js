@@ -1,6 +1,7 @@
 /* OpenWatermark - app.js
- * Versie 2.3.0 - MIT-licentie
+ * Versie 2.4.0 - MIT-licentie
  * Lightroom-stijl. Alleen Nederlands. Dubbelklik slider = reset.
+ * Nieuw in 2.4.0: bestandsnaam-suffix met suggesties.
  */
 (function () {
   'use strict';
@@ -13,7 +14,7 @@
     step_download: "Klaar",
 
     info_title: "Hoe werkt OpenWatermark?",
-    info_body: "<p>OpenWatermark plaatst een watermerk over je foto's zodat ze moeilijker te stelen zijn. Alles gebeurt in je eigen browser, je foto's worden nergens naartoe gestuurd.</p><h3>Wat het doet</h3><p>Je kiest een logo of een tekst. De app herhaalt dat watermerk over de hele foto. Dat maakt het lastiger voor iemand met AI-tools om het weg te poetsen zonder de foto te beschadigen.</p><h3>Wat het niet doet</h3><p>Geen enkele methode kan garanderen dat een watermerk niet verwijderd wordt. Het maakt het alleen lastiger. Voor echte bescherming van herkomst heb je C2PA-metadata nodig, dat zit al in moderne camera's.</p><h3>Je verificatiecode</h3><p>Je kunt optioneel een code invullen. Die wordt onzichtbaar in de foto verborgen. Later kun je daarmee bewijzen dat de foto van jou is, ook als iemand het zichtbare watermerk heeft weggehaald.</p>",
+    info_body: "<p>OpenWatermark plaatst een watermerk over je foto's zodat ze moeilijker te stelen zijn. Alles gebeurt in je eigen browser, je foto's worden nergens naartoe gestuurd.</p><h3>Wat het doet</h3><p>Je kiest een logo of een tekst. De app herhaalt dat watermerk over de hele foto. Dat maakt het lastiger voor iemand met AI-tools om het weg te poetsen zonder de foto te beschadigen.</p><h3>Wat het niet doet</h3><p>Geen enkele methode kan garanderen dat een watermerk niet verwijderd wordt. Het maakt het alleen lastiger. Voor echte bescherming van herkomst heb je C2PA-metadata nodig, dat zit al in moderne camera's.</p><h3>Je verificatiecode</h3><p>Je kunt optioneel een code invullen. Die wordt onzichtbaar in de foto verborgen. Later kun je daarmee bewijs hebben dat de foto van jou is, ook als iemand het zichtbare watermerk heeft weggehaald. Het is geen absolute garantie.</p>",
     info_close: "Sluiten",
 
     photos_title: "Kies je foto's",
@@ -47,11 +48,13 @@
     set_opacity: "Transparantie",
     set_rotation: "Rotatie",
     set_spacing: "Afstand",
+    set_suffix: "Bestandsnaam",
+    set_suffix_help: "Achter de bestandsnaam. Leeg = originele naam.",
     set_payload: "Verificatiecode",
     set_payload_hint: "bv. jouw@email.nl",
-    set_payload_help: "Deze code wordt onzichtbaar in elke foto verborgen. Je kunt hem later gebruiken om te bewijzen dat de foto van jou is.",
+    set_payload_help: "Deze code wordt onzichtbaar in elke foto verborgen. Je kunt hem later gebruiken als aanwijzing dat de foto van jou is.",
     set_payload_more: "Wat doet deze code precies?",
-    set_payload_explanation: "<p>Je verificatiecode wordt <strong>onzichtbaar in je foto verborgen</strong>. Je ziet er niets van, maar de code zit wel in de afbeelding. Dit heet een <em>digitaal watermerk</em>.</p><p><strong>Waarom is dit handig?</strong> Stel, iemand steelt je foto, poetst je logo weg en zet hem op Instagram. Met deze code kun je later bewijzen dat de foto van jou is, ook als het zichtbare logo verdwenen is.</p><p><strong>Wat vul je in?</strong> Iets unieks dat alleen jij weet. Bijvoorbeeld je e-mailadres, je website, of een code zoals <code>keyzerphotos-2026</code>. Een keer instellen is genoeg. De app gebruikt dezelfde code voor al je foto's en onthoudt hem voor de volgende keer.</p><p><strong>Wat het niet is:</strong> geen wachtwoord, geen absolute garantie. Een vastberaden aanvaller kan het ook verwijderen. Maar het maakt het wel een stuk lastiger.</p>",
+    set_payload_explanation: "<p>Je verificatiecode wordt <strong>onzichtbaar in je foto verborgen</strong>. Je ziet er niets van, maar de code zit wel in de afbeelding. Dit heet een <em>digitaal watermerk</em>.</p><p><strong>Waarom is dit handig?</strong> Stel, iemand steelt je foto, poetst je logo weg en zet hem op Instagram. Met deze code kun je een aanwijzing hebben dat de foto van jou is, ook als het zichtbare logo verdwenen is.</p><p><strong>Wat vul je in?</strong> Iets unieks dat alleen jij weet. Bijvoorbeeld je e-mailadres, je website, of een code zoals <code>keyzerphotos-2026</code>. Een keer instellen is genoeg. De app gebruikt dezelfde code voor al je foto's en onthoudt hem voor de volgende keer.</p><p><strong>Wat het niet is:</strong> geen wachtwoord, geen absolute garantie. Een vastberaden aanvaller kan het ook verwijderen. En bij zware compressie of AI-bewerking kan het verdwijnen. Het is een extra laag, geen slot.</p>",
 
     result_title: "Klaar om te downloaden",
     result_hint: "Controleer het voorbeeld en klik op downloaden",
@@ -64,7 +67,7 @@
     counter_text: "foto's verwerkt met dit watermerk",
 
     notice_strong: "Eerlijk:",
-    notice_text: " een zichtbaar watermerk maakt verwijdering lastiger, maar niet onmogelijk. De onzichtbare laag overleeft JPEG-compressie en verkleining, maar is geen absolute garantie. Voor echte herkomstbescherming is C2PA-metadata nodig, dat zit al in moderne camera's zoals Nikon Z9 en Canon R5 Mark II.",
+    notice_text: " een zichtbaar watermerk maakt verwijdering lastiger, maar niet onmogelijk. De onzichtbare laag overleeft milde compressie, maar is geen absolute garantie. Voor echte herkomstbescherming is C2PA-metadata nodig, dat zit al in moderne camera's zoals Nikon Z9 en Canon R5 Mark II.",
     footer_text: "OpenWatermark - Open source op",
     footer_info: "Info",
     footer_privacy: "Je foto's blijven op je toestel. Niets wordt verstuurd.",
@@ -98,7 +101,8 @@
     text: 'ow_wm_text',
     wmMode: 'ow_wm_mode',
     textColor: 'ow_wm_color',
-    counter: 'ow_counter'
+    counter: 'ow_counter',
+    suffix: 'ow_suffix'
   };
   const PRESETS = {
     preview: { maxSide: 1600, quality: 0.82 },
@@ -168,6 +172,9 @@
   const rotation = $('rotation');
   const spacing = $('spacing');
   const payloadInput = $('payloadInput');
+  const suffixInput = $('suffixInput');
+  const suffixDropdownBtn = $('suffixDropdownBtn');
+  const suffixMenu = $('suffixMenu');
 
   const logoSizeVal = $('logoSizeVal');
   const opacityVal = $('opacityVal');
@@ -217,6 +224,12 @@
 
   function saveTextColor(v) { safeSet(STORAGE.textColor, v); }
   function loadTextColor() { return safeGet(STORAGE.textColor) || 'white'; }
+
+  function saveSuffix(v) { safeSet(STORAGE.suffix, v || ''); }
+  function loadSuffixValue() {
+    const stored = safeGet(STORAGE.suffix);
+    return stored === null ? '_OpenWatermark' : stored;
+  }
 
   function getCounter() {
     const v = parseInt(safeGet(STORAGE.counter) || '0', 10);
@@ -518,314 +531,4 @@
     img.onload = () => {
       logoImage = img;
       if (logoThumb) logoThumb.src = stored.dataUrl;
-      if (logoName) logoName.textContent = stored.name;
-      if (logoInfoRow) logoInfoRow.style.display = 'block';
-      if (logoZone) logoZone.style.display = 'none';
-      updateFlow();
-      if (photos.length > 0 && hasWatermark()) generatePreview();
-    };
-    img.onerror = () => { clearLogoData(); };
-    img.src = stored.dataUrl;
-  }
-
-  function bindSlider(el, valEl, suffix) {
-    if (!el || !valEl) return;
-
-    el.addEventListener('input', () => {
-      valEl.textContent = el.value + suffix;
-      if (photos.length > 0 && hasWatermark()) debouncePreview();
-    });
-
-    const resetToDefault = () => {
-      const def = el.getAttribute('data-default');
-      if (def === null) return;
-      el.value = def;
-      valEl.textContent = def + suffix;
-      if (photos.length > 0 && hasWatermark()) debouncePreview();
-    };
-
-    el.addEventListener('dblclick', resetToDefault);
-
-    let lastTap = 0;
-    el.addEventListener('touchend', (e) => {
-      const now = Date.now();
-      if (now - lastTap < 350) {
-        e.preventDefault();
-        resetToDefault();
-      }
-      lastTap = now;
-    });
-  }
-
-  bindSlider(logoSize, logoSizeVal, '%');
-  bindSlider(opacity, opacityVal, '%');
-  bindSlider(rotation, rotationVal, '\u00B0');
-  bindSlider(spacing, spacingVal, '');
-
-  let previewTimer = null;
-  function debouncePreview() {
-    if (previewTimer) clearTimeout(previewTimer);
-    previewTimer = setTimeout(generatePreview, 150);
-  }
-
-  function loadImage(file) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const url = URL.createObjectURL(file);
-      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
-      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image load failed')); };
-      img.src = url;
-    });
-  }
-
-  function loadImageFromBlob(blob) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const url = URL.createObjectURL(blob);
-      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
-      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Blob load failed')); };
-      img.src = url;
-    });
-  }
-
-  function createTextWatermarkImage(text, color, fontSize) {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const font = 'bold ' + fontSize + 'px -apple-system, BlinkMacSystemFont, sans-serif';
-
-    ctx.font = font;
-    const metrics = ctx.measureText(text);
-    const width = Math.ceil(metrics.width) + 20;
-    const height = Math.ceil(fontSize * 1.4);
-
-    canvas.width = width;
-    canvas.height = height;
-    const ctx2 = canvas.getContext('2d');
-    ctx2.font = font;
-    ctx2.fillStyle = color === 'black' ? '#000000' : '#ffffff';
-    ctx2.textBaseline = 'middle';
-    ctx2.fillText(text, 10, height / 2);
-
-    return canvas;
-  }
-
-  async function applyWatermark(baseImg) {
-    const preset = PRESETS[currentPreset];
-
-    let outW = baseImg.width;
-    let outH = baseImg.height;
-    if (preset.maxSide !== Infinity) {
-      const longest = Math.max(outW, outH);
-      if (longest > preset.maxSide) {
-        const scale = preset.maxSide / longest;
-        outW = Math.round(outW * scale);
-        outH = Math.round(outH * scale);
-      }
-    }
-
-    const canvas = document.createElement('canvas');
-    canvas.width = outW;
-    canvas.height = outH;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(baseImg, 0, 0, outW, outH);
-
-    let wmSource;
-    if (wmMode === 'logo' && logoImage) {
-      wmSource = logoImage;
-    } else {
-      const baseDim = Math.min(outW, outH);
-      const fontSize = Math.max(20, Math.round(baseDim * 0.05));
-      wmSource = createTextWatermarkImage(wmText.value.trim() || 'OpenWatermark', textColor, fontSize);
-    }
-
-    const wmRatio = wmSource.height / wmSource.width;
-    const logoW = (outW * parseInt(logoSize.value, 10)) / 100;
-    const logoH = logoW * wmRatio;
-    const gap = parseInt(spacing.value, 10);
-    const rot = (parseInt(rotation.value, 10) * Math.PI) / 180;
-    const cellW = logoW + gap;
-    const cellH = logoH + gap;
-    const margin = Math.max(logoW, logoH);
-
-    ctx.globalAlpha = parseInt(opacity.value, 10) / 100;
-
-    for (let y = -margin; y < outH + margin; y += cellH) {
-      for (let x = -margin; x < outW + margin; x += cellW) {
-        ctx.save();
-        ctx.translate(x + logoW / 2, y + logoH / 2);
-        ctx.rotate(rot);
-        ctx.drawImage(wmSource, -logoW / 2, -logoH / 2, logoW, logoH);
-        ctx.restore();
-      }
-    }
-    ctx.globalAlpha = 1;
-
-    const visibleBlob = await new Promise((resolve) =>
-      canvas.toBlob(resolve, 'image/jpeg', 0.95)
-    );
-
-    const payload = (payloadInput && payloadInput.value ? payloadInput.value : 'OpenWatermark-standaard').trim();
-
-    if (window.OpenWatermarkInvisible && payload) {
-      try {
-        const visibleImg = await loadImageFromBlob(visibleBlob);
-        return await window.OpenWatermarkInvisible.embed(visibleImg, payload);
-      } catch (err) {
-        console.warn('Onzichtbaar watermerk overgeslagen:', err.message);
-        return visibleBlob;
-      }
-    }
-    return visibleBlob;
-  }
-
-  function revokePreviewUrl() {
-    if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
-  }
-
-  async function generatePreview() {
-    if (!hasWatermark() || photos.length === 0) return;
-    try {
-      const img = await loadImage(photos[0].file);
-      const blob = await applyWatermark(img);
-      revokePreviewUrl();
-      previewUrl = URL.createObjectURL(blob);
-      if (preview) {
-        preview.src = previewUrl;
-        preview.style.display = 'block';
-      }
-      if (previewEmpty) previewEmpty.classList.add('hidden');
-    } catch (err) {
-      setStatus(t('preview_error') + err.message, 'error');
-    }
-  }
-
-  if (downloadBtn) {
-    downloadBtn.addEventListener('click', async () => {
-      if (busy) return;
-      if (!hasWatermark() || photos.length === 0) return;
-
-      busy = true;
-      updateFlow();
-      if (progressBar) progressBar.classList.add('visible');
-      if (progressFill) progressFill.style.width = '0%';
-
-      try {
-        const results = [];
-        for (let i = 0; i < photos.length; i++) {
-          setStatus(t('processing_one', i + 1, photos.length));
-          const p = photos[i];
-          const img = await loadImage(p.file);
-          const blob = await applyWatermark(img);
-          const baseName = p.file.name.replace(/\.[^.]+$/, '') || `foto_${i + 1}`;
-          results.push({ name: `${baseName}_watermerk.jpg`, blob });
-          if (progressFill) progressFill.style.width = `${((i + 1) / photos.length) * 100}%`;
-          await new Promise(r => setTimeout(r, 0));
-        }
-
-        if (results.length === 1) {
-          const url = URL.createObjectURL(results[0].blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = results[0].name;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          setTimeout(() => URL.revokeObjectURL(url), 60000);
-          setStatus(t('done_single'), 'success');
-        } else {
-          if (typeof JSZip === 'undefined') {
-            setStatus(t('no_jszip'), 'error');
-            busy = false;
-            updateFlow();
-            return;
-          }
-          setStatus(t('creating_zip'));
-          const zip = new JSZip();
-          const folder = zip.folder('OpenWatermark');
-          results.forEach(r => folder.file(r.name, r.blob));
-          const zipBlob = await zip.generateAsync({
-            type: 'blob',
-            compression: 'DEFLATE',
-            compressionOptions: { level: 6 }
-          });
-          const url = URL.createObjectURL(zipBlob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `OpenWatermark_${new Date().toISOString().slice(0, 10)}.zip`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          setTimeout(() => URL.revokeObjectURL(url), 60000);
-          setStatus(t('done_multiple', results.length), 'success');
-        }
-
-        addToCounter(results.length);
-
-        downloadBtn.classList.add('success-flash');
-        const originalText = downloadBtn.textContent;
-        downloadBtn.textContent = '\u2713';
-        setTimeout(() => {
-          downloadBtn.classList.remove('success-flash');
-          downloadBtn.textContent = originalText;
-          updateDownloadLabel();
-        }, 1800);
-
-        setStep(4);
-      } catch (err) {
-        console.error(err);
-        setStatus(t('error_prefix') + (err && err.message ? err.message : err), 'error');
-      } finally {
-        busy = false;
-        updateFlow();
-        setTimeout(() => {
-          if (progressBar) progressBar.classList.remove('visible');
-          if (progressFill) progressFill.style.width = '0%';
-        }, 1200);
-      }
-    });
-  }
-
-  if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
-      photos = [];
-      if (photoInput) photoInput.value = '';
-      revokePreviewUrl();
-      if (preview) {
-        preview.removeAttribute('src');
-        preview.style.display = 'none';
-      }
-      renderPhotoList();
-      setStatus('');
-      updateFlow();
-    });
-  }
-
-  if (payloadInput) {
-    payloadInput.addEventListener('input', () => {
-      savePayload(payloadInput.value);
-    });
-  }
-
-  applyTranslations();
-
-  const savedPayload = loadPayloadValue();
-  if (savedPayload && payloadInput) payloadInput.value = savedPayload;
-
-  const savedText = loadTextValue();
-  if (savedText && wmText) wmText.value = savedText;
-
-  const savedMode = loadWmMode();
-  setWmMode(savedMode);
-
-  const savedColor = loadTextColor();
-  setTextColor(savedColor);
-
-  restoreLogo();
-  updateCounterDisplay();
-
-  if (!window.OpenWatermarkInvisible && invisibleAlert) {
-    invisibleAlert.classList.add('visible');
-  }
-
-  updateFlow();
-})();
+    
