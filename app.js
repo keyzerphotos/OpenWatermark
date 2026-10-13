@@ -1,5 +1,5 @@
 /* OpenWatermark — app.js
- * Versie 0.7.0 · MIT-licentie
+ * Versie 0.8.0 · MIT-licentie
  */
 (function () {
   'use strict';
@@ -18,6 +18,7 @@
       photos_hint_card: "Sleep of tik om te kiezen",
       photos_drop: "Sleep of tik om foto's te kiezen",
       photos_hint: "meerdere foto's mogelijk",
+      photos_counter: (n, max) => `<strong>${n}</strong> van ${max} foto's geladen`,
       logo_title: "Kies je logo",
       logo_hint_card: "Een PNG met transparante achtergrond werkt het best",
       logo_drop: "Sleep of tik om je logo te kiezen",
@@ -32,21 +33,25 @@
       set_spacing: "Afstand",
       set_payload: "Verificatiecode",
       set_payload_hint: "bv. jouw@email.nl",
+      set_payload_help: "Deze code wordt onzichtbaar in elke foto verborgen. Je kunt hem later gebruiken om te bewijzen dat de foto van jou is.",
       result_title: "Klaar om te downloaden",
       result_hint: "Controleer het voorbeeld en klik op downloaden",
       result_preview: "Voorbeeld (eerste foto)",
+      result_empty: "Het voorbeeld verschijnt zodra je foto's en een logo hebt geladen.",
       result_download: "Download ZIP",
       result_reset: "Wissen",
       notice_strong: "Eerlijk:",
       notice_text: " een zichtbaar watermerk maakt verwijdering lastiger, maar niet onmogelijk. De onzichtbare laag overleeft JPEG-compressie en verkleining, maar is geen absolute garantie. Voor echte herkomstbescherming is C2PA-metadata nodig — dat zit al in moderne camera's zoals Nikon Z9 en Canon R5 Mark II.",
       footer_text: "OpenWatermark · Open source op",
       footer_privacy: "Je foto's blijven op je toestel. Niets wordt verstuurd.",
+      invisible_alert: "De onzichtbare watermerk-laag kon niet geladen worden. Je foto's krijgen alleen het zichtbare watermerk.",
       max_photos: (max, skipped) => `Maximaal ${max} foto's per keer. ${skipped} overgeslagen.`,
       photos_loaded: (n) => `${n} foto('s) geladen.`,
       logo_loaded: "Logo geladen.",
       logo_must_be_image: "Logo moet een afbeelding zijn.",
       logo_load_error: "Logo kon niet geladen worden.",
       processing_one: (i, n) => `Foto ${i} van ${n}...`,
+      processing_preview: "Voorbeeld maken...",
       creating_zip: "ZIP maken...",
       done_zip: (n) => `Klaar! ${n} foto('s) gedownload.`,
       error_prefix: "Fout: ",
@@ -64,6 +69,7 @@
       photos_hint_card: "Drag or tap to choose",
       photos_drop: "Drag or tap to choose photos",
       photos_hint: "multiple photos allowed",
+      photos_counter: (n, max) => `<strong>${n}</strong> of ${max} photos loaded`,
       logo_title: "Choose your logo",
       logo_hint_card: "A PNG with transparent background works best",
       logo_drop: "Drag or tap to choose your logo",
@@ -78,21 +84,25 @@
       set_spacing: "Spacing",
       set_payload: "Verification code",
       set_payload_hint: "e.g. your@email.com",
+      set_payload_help: "This code is hidden invisibly in every photo. You can use it later to prove the photo is yours.",
       result_title: "Ready to download",
       result_hint: "Check the preview and click download",
       result_preview: "Preview (first photo)",
+      result_empty: "The preview appears once you've loaded photos and a logo.",
       result_download: "Download ZIP",
       result_reset: "Clear",
       notice_strong: "Honest:",
       notice_text: " a visible watermark makes removal harder, but not impossible. The invisible layer survives JPEG compression and resizing, but is not an absolute guarantee. For real provenance protection, C2PA metadata is needed — already built into modern cameras like the Nikon Z9 and Canon R5 Mark II.",
       footer_text: "OpenWatermark · Open source on",
       footer_privacy: "Your photos stay on your device. Nothing is sent.",
+      invisible_alert: "The invisible watermark layer could not be loaded. Your photos will only get the visible watermark.",
       max_photos: (max, skipped) => `Maximum ${max} photos at a time. ${skipped} skipped.`,
       photos_loaded: (n) => `${n} photo(s) loaded.`,
       logo_loaded: "Logo loaded.",
       logo_must_be_image: "Logo must be an image.",
       logo_load_error: "Logo could not be loaded.",
       processing_one: (i, n) => `Photo ${i} of ${n}...`,
+      processing_preview: "Creating preview...",
       creating_zip: "Creating ZIP...",
       done_zip: (n) => `Done! ${n} photo(s) downloaded.`,
       error_prefix: "Error: ",
@@ -110,6 +120,7 @@
       photos_hint_card: "Ziehen oder tippen zum Auswählen",
       photos_drop: "Ziehen oder tippen, um Fotos zu wählen",
       photos_hint: "mehrere Fotos möglich",
+      photos_counter: (n, max) => `<strong>${n}</strong> von ${max} Fotos geladen`,
       logo_title: "Wähle dein Logo",
       logo_hint_card: "Ein PNG mit transparentem Hintergrund funktioniert am besten",
       logo_drop: "Ziehen oder tippen, um dein Logo zu wählen",
@@ -124,21 +135,25 @@
       set_spacing: "Abstand",
       set_payload: "Verifizierungscode",
       set_payload_hint: "z.B. deine@email.de",
+      set_payload_help: "Dieser Code wird unsichtbar in jedem Foto versteckt. Du kannst ihn später nutzen, um zu beweisen, dass das Foto dir gehört.",
       result_title: "Bereit zum Herunterladen",
       result_hint: "Prüfe die Vorschau und klicke auf Herunterladen",
       result_preview: "Vorschau (erstes Foto)",
+      result_empty: "Die Vorschau erscheint, sobald du Fotos und ein Logo geladen hast.",
       result_download: "ZIP herunterladen",
       result_reset: "Löschen",
       notice_strong: "Ehrlich:",
       notice_text: " ein sichtbares Wasserzeichen erschwert das Entfernen, macht es aber nicht unmöglich. Die unsichtbare Ebene übersteht JPEG-Kompression und Verkleinerung, ist aber keine absolute Garantie. Für echten Herkunftsschutz ist C2PA-Metadaten nötig — bereits in modernen Kameras wie der Nikon Z9 und Canon R5 Mark II integriert.",
       footer_text: "OpenWatermark · Open Source auf",
       footer_privacy: "Deine Fotos bleiben auf deinem Gerät. Nichts wird gesendet.",
+      invisible_alert: "Die unsichtbare Wasserzeichen-Ebene konnte nicht geladen werden. Deine Fotos erhalten nur das sichtbare Wasserzeichen.",
       max_photos: (max, skipped) => `Maximal ${max} Fotos pro Vorgang. ${skipped} übersprungen.`,
       photos_loaded: (n) => `${n} Foto(s) geladen.`,
       logo_loaded: "Logo geladen.",
       logo_must_be_image: "Logo muss ein Bild sein.",
       logo_load_error: "Logo konnte nicht geladen werden.",
       processing_one: (i, n) => `Foto ${i} von ${n}...`,
+      processing_preview: "Vorschau wird erstellt...",
       creating_zip: "ZIP wird erstellt...",
       done_zip: (n) => `Fertig! ${n} Foto(s) heruntergeladen.`,
       error_prefix: "Fehler: ",
@@ -202,6 +217,7 @@
   const photoZone = $('photoZone');
   const photoInput = $('photoInput');
   const photoList = $('photoList');
+  const photoCounter = $('photoCounter');
   const logoZone = $('logoZone');
   const logoInput = $('logoInput');
   const logoInfoRow = $('logoInfoRow');
@@ -209,12 +225,14 @@
   const logoName = $('logoName');
   const changeLogoBtn = $('changeLogoBtn');
   const preview = $('preview');
+  const previewEmpty = $('previewEmpty');
   const statusEl = $('status');
   const downloadZipBtn = $('downloadZipBtn');
   const resetBtn = $('resetBtn');
   const actionBar = $('actionBar');
   const progressBar = $('progressBar');
   const progressFill = $('progressFill');
+  const invisibleAlert = $('invisibleAlert');
 
   const logoSize = $('logoSize');
   const opacity = $('opacity');
@@ -264,6 +282,29 @@
 
     actionBar.classList.toggle('visible', hasAll);
     downloadZipBtn.disabled = !hasAll || busy;
+
+    updatePhotoCounter();
+
+    // Preview-staat
+    if (!hasAll) {
+      preview.style.display = 'none';
+      previewEmpty.classList.remove('hidden');
+    } else if (preview.src) {
+      preview.style.display = 'block';
+      previewEmpty.classList.add('hidden');
+    } else {
+      preview.style.display = 'none';
+      previewEmpty.classList.remove('hidden');
+    }
+  }
+
+  function updatePhotoCounter() {
+    if (photos.length === 0) {
+      photoCounter.classList.remove('visible');
+      return;
+    }
+    photoCounter.classList.add('visible');
+    photoCounter.innerHTML = t('photos_counter', photos.length, MAX_PHOTOS);
   }
 
   function setStatus(msg, type) {
@@ -489,6 +530,8 @@
       revokePreviewUrl();
       previewUrl = URL.createObjectURL(blob);
       preview.src = previewUrl;
+      preview.style.display = 'block';
+      previewEmpty.classList.add('hidden');
     } catch (err) {
       setStatus(t('preview_error') + err.message, 'error');
     }
@@ -542,6 +585,15 @@
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 60000);
 
+      // Succes-flits op de knop
+      downloadZipBtn.classList.add('success-flash');
+      const originalText = downloadZipBtn.textContent;
+      downloadZipBtn.textContent = '✓';
+      setTimeout(() => {
+        downloadZipBtn.classList.remove('success-flash');
+        downloadZipBtn.textContent = originalText;
+      }, 1800);
+
       setStep(4);
       setStatus(t('done_zip', photos.length), 'success');
     } catch (err) {
@@ -567,6 +619,7 @@
     logoImage = null;
     revokePreviewUrl();
     preview.removeAttribute('src');
+    preview.style.display = 'none';
     renderPhotoList();
     logoInfoRow.style.display = 'none';
     logoZone.style.display = 'block';
@@ -579,5 +632,11 @@
   //  INIT
   // ============================================================
   applyTranslations();
+
+  // Controleer of de onzichtbare laag geladen is
+  if (!window.OpenWatermarkInvisible) {
+    invisibleAlert.classList.add('visible');
+  }
+
   updateFlow();
 })();
