@@ -31,21 +31,23 @@
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html { -webkit-text-size-adjust: 100%; }
-  html, body {
+
+  html {
+    background: var(--bg);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
     background: var(--bg);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
-  }
-  body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: calc(20px + var(--safe-top)) 16px calc(120px + var(--safe-bottom));
-    overscroll-behavior-y: contain;
+    padding: calc(20px + var(--safe-top)) 16px calc(140px + var(--safe-bottom));
   }
 
   /* ---------- Taalswitch ---------- */
@@ -88,6 +90,7 @@
     max-width: 720px;
     text-align: center;
     margin-bottom: 28px;
+    margin-top: 40px;
   }
   .logo {
     display: inline-flex;
@@ -425,6 +428,7 @@
     font-family: inherit;
     font-size: 0.85rem;
     transition: border-color 0.15s;
+    min-width: 0;
   }
   .text-input:focus {
     outline: none;
@@ -502,7 +506,7 @@
     left: 0;
     right: 0;
     padding: 14px 16px calc(14px + var(--safe-bottom));
-    background: linear-gradient(to top, var(--bg) 60%, transparent);
+    background: linear-gradient(to top, var(--bg) 60%, rgba(8, 8, 10, 0.9) 100%);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     display: flex;
@@ -510,8 +514,12 @@
     z-index: 90;
     transform: translateY(120%);
     transition: transform 0.3s ease;
+    pointer-events: none;
   }
-  .action-bar.visible { transform: translateY(0); }
+  .action-bar.visible {
+    transform: translateY(0);
+    pointer-events: auto;
+  }
   .action-bar-inner {
     width: 100%;
     max-width: 720px;
