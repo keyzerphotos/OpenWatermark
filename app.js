@@ -1,5 +1,5 @@
 /* OpenWatermark - app.js
- * Versie 2.0.0 - MIT-licentie
+ * Versie 2.0.1 - MIT-licentie
  */
 (function () {
   'use strict';
@@ -178,7 +178,7 @@
       step_download: "Fertig",
 
       info_title: "Wie funktioniert OpenWatermark?",
-      info_body: "<p>OpenWatermark legt ein Wasserzeichen uber deine Fotos, damit sie schwerer zu stehlen sind. Alles passiert in deinem Browser, deine Fotos werden nirgendwohin gesendet.</p><h3>Was es tut</h3><p>Du wahst ein Logo oder einen Text. Die App wiederholt dieses Wasserzeichen uber das ganze Foto. Das macht es fur jemanden mit KI-Werkzeugen schwerer, es zu entfernen, ohne das Foto zu beschadigen.</p><h3>Was es nicht tut</h3><p>Keine Methode kann garantieren, dass ein Wasserzeichen nicht entfernt wird. Es macht es nur schwieriger. Fur echten Herkunftsschutz brauchst du C2PA-Metadaten, die moderne Kameras bereits unterstutzen.</p><h3>Dein Verifizierungscode</h3><p>Du kannst optional einen Code eingeben. Er wird unsichtbar im Foto versteckt. Spater kannst du damit beweisen, dass das Foto dir gehort, auch wenn das sichtbare Wasserzeichen entfernt wurde.</p>",
+      info_body: "<p>OpenWatermark legt ein Wasserzeichen uber deine Fotos, damit sie schwerer zu stehlen sind. Alles passiert in deinem Browser, deine Fotos werden nirgendwohin gesendet.</p><h3>Was es tut</h3><p>Du wahlst ein Logo oder einen Text. Die App wiederholt dieses Wasserzeichen uber das ganze Foto. Das macht es fur jemanden mit KI-Werkzeugen schwerer, es zu entfernen, ohne das Foto zu beschadigen.</p><h3>Was es nicht tut</h3><p>Keine Methode kann garantieren, dass ein Wasserzeichen nicht entfernt wird. Es macht es nur schwieriger. Fur echten Herkunftsschutz brauchst du C2PA-Metadaten, die moderne Kameras bereits unterstutzen.</p><h3>Dein Verifizierungscode</h3><p>Du kannst optional einen Code eingeben. Er wird unsichtbar im Foto versteckt. Spater kannst du damit beweisen, dass das Foto dir gehort, auch wenn das sichtbare Wasserzeichen entfernt wurde.</p>",
       info_close: "Schliessen",
 
       photos_title: "Wahle deine Fotos",
@@ -307,7 +307,6 @@
       de: "OpenWatermark - Schutze deine Fotos"
     };
     document.title = titles[currentLang] || titles.en;
-    updateDownloadLabel();
   }
 
   // ============================================================
@@ -426,6 +425,7 @@
     updateCounterDisplay();
   }
   function updateCounterDisplay() {
+    if (!counterBox || !counterNumber) return;
     const total = getCounter();
     if (total > 0) {
       counterBox.classList.add('visible');
@@ -447,11 +447,13 @@
   }
 
   function hasWatermark() {
+    if (!wmText) return wmMode === 'logo' ? !!logoImage : false;
     if (wmMode === 'logo') return !!logoImage;
     return wmText.value.trim().length > 0;
   }
 
   function updateDownloadLabel() {
+    if (!downloadBtn) return;
     if (photos.length === 1) {
       downloadBtn.textContent = t('result_download_single');
     } else if (photos.length > 1) {
@@ -466,22 +468,29 @@
     const hasWm = hasWatermark();
     const hasAll = hasPhotos && hasWm;
 
-    cardWatermark.classList.toggle('locked', !hasPhotos);
-    cardWatermark.classList.toggle('done', hasPhotos && hasWm);
-
-    cardSettings.classList.toggle('locked', !hasAll);
-    cardResult.classList.toggle('locked', !hasAll);
-    cardResult.classList.toggle('done', hasAll);
+    if (cardWatermark) {
+      cardWatermark.classList.toggle('locked', !hasPhotos);
+      cardWatermark.classList.toggle('done', hasPhotos && hasWm);
+    }
+    if (cardSettings) {
+      cardSettings.classList.toggle('locked', !hasAll);
+    }
+    if (cardResult) {
+      cardResult.classList.toggle('locked', !hasAll);
+      cardResult.classList.toggle('done', hasAll);
+    }
 
     if (!hasPhotos) setStep(1);
     else if (!hasWm) setStep(2);
     else setStep(3);
 
-    actionBar.classList.toggle('visible', hasAll);
-    downloadBtn.disabled = !hasAll || busy;
+    if (actionBar) actionBar.classList.toggle('visible', hasAll);
+    if (downloadBtn) downloadBtn.disabled = !hasAll || busy;
 
     updatePhotoCounter();
     updateDownloadLabel();
+
+    if (!preview || !previewEmpty) return;
 
     if (!hasAll) {
       preview.style.display = 'none';
@@ -496,6 +505,7 @@
   }
 
   function updatePhotoCounter() {
+    if (!photoCounter) return;
     if (photos.length === 0) {
       photoCounter.classList.remove('visible');
       return;
@@ -505,6 +515,7 @@
   }
 
   function setStatus(msg, type) {
+    if (!statusEl) return;
     statusEl.textContent = msg || '';
     statusEl.className = 'status' + (type ? ' ' + type : '');
   }
@@ -515,18 +526,22 @@
   function setWmMode(mode) {
     wmMode = mode;
     saveWmMode(mode);
-    wmToggle.querySelectorAll('button').forEach(b => {
-      b.classList.toggle('active', b.dataset.mode === mode);
-    });
-    textMode.classList.toggle('visible', mode === 'text');
-    logoMode.classList.toggle('hidden', mode !== 'logo');
+    if (wmToggle) {
+      wmToggle.querySelectorAll('button').forEach(b => {
+        b.classList.toggle('active', b.dataset.mode === mode);
+      });
+    }
+    if (textMode) textMode.classList.toggle('visible', mode === 'text');
+    if (logoMode) logoMode.classList.toggle('hidden', mode !== 'logo');
     updateFlow();
     if (photos.length > 0 && hasWatermark()) generatePreview();
   }
 
-  wmToggle.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('click', () => setWmMode(btn.dataset.mode));
-  });
+  if (wmToggle) {
+    wmToggle.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => setWmMode(btn.dataset.mode));
+    });
+  }
 
   // ============================================================
   //  KLEUR
@@ -534,53 +549,67 @@
   function setTextColor(color) {
     textColor = color;
     saveTextColor(color);
-    colorPicker.querySelectorAll('button').forEach(b => {
-      b.classList.toggle('active', b.dataset.color === color);
-    });
+    if (colorPicker) {
+      colorPicker.querySelectorAll('button').forEach(b => {
+        b.classList.toggle('active', b.dataset.color === color);
+      });
+    }
     if (photos.length > 0 && hasWatermark()) debouncePreview();
   }
 
-  colorPicker.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('click', () => setTextColor(btn.dataset.color));
-  });
+  if (colorPicker) {
+    colorPicker.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => setTextColor(btn.dataset.color));
+    });
+  }
 
   // ============================================================
   //  PRESETS
   // ============================================================
-  presetRow.querySelectorAll('.preset-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentPreset = btn.dataset.preset;
-      presetRow.querySelectorAll('.preset-btn').forEach(b => {
-        b.classList.toggle('active', b.dataset.preset === currentPreset);
+  if (presetRow) {
+    presetRow.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentPreset = btn.dataset.preset;
+        presetRow.querySelectorAll('.preset-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.preset === currentPreset);
+        });
       });
     });
-  });
+  }
 
   // ============================================================
   //  INFO OVERLAY
   // ============================================================
-  infoBtn.addEventListener('click', () => {
-    infoOverlay.classList.add('visible');
-  });
-  infoClose.addEventListener('click', () => {
-    infoOverlay.classList.remove('visible');
-  });
-  infoOverlay.addEventListener('click', (e) => {
-    if (e.target === infoOverlay) infoOverlay.classList.remove('visible');
-  });
+  if (infoBtn && infoOverlay) {
+    infoBtn.addEventListener('click', () => {
+      infoOverlay.classList.add('visible');
+    });
+  }
+  if (infoClose && infoOverlay) {
+    infoClose.addEventListener('click', () => {
+      infoOverlay.classList.remove('visible');
+    });
+  }
+  if (infoOverlay) {
+    infoOverlay.addEventListener('click', (e) => {
+      if (e.target === infoOverlay) infoOverlay.classList.remove('visible');
+    });
+  }
 
   // ============================================================
   //  FOTO'S
   // ============================================================
-  photoZone.addEventListener('click', () => photoInput.click());
-  photoInput.addEventListener('change', (e) => addPhotos(e.target.files));
-  photoZone.addEventListener('dragover', (e) => { e.preventDefault(); photoZone.classList.add('dragover'); });
-  photoZone.addEventListener('dragleave', () => photoZone.classList.remove('dragover'));
-  photoZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    photoZone.classList.remove('dragover');
-    if (e.dataTransfer.files && e.dataTransfer.files.length) addPhotos(e.dataTransfer.files);
-  });
+  if (photoZone && photoInput) {
+    photoZone.addEventListener('click', () => photoInput.click());
+    photoInput.addEventListener('change', (e) => addPhotos(e.target.files));
+    photoZone.addEventListener('dragover', (e) => { e.preventDefault(); photoZone.classList.add('dragover'); });
+    photoZone.addEventListener('dragleave', () => photoZone.classList.remove('dragover'));
+    photoZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      photoZone.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files.length) addPhotos(e.dataTransfer.files);
+    });
+  }
 
   function addPhotos(fileList) {
     const files = Array.from(fileList || []).filter(f => f.type && f.type.startsWith('image/'));
@@ -612,6 +641,7 @@
   }
 
   function renderPhotoList() {
+    if (!photoList) return;
     photoList.innerHTML = '';
     if (photos.length === 0) { photoList.classList.remove('visible'); return; }
     photoList.classList.add('visible');
@@ -648,27 +678,34 @@
   // ============================================================
   //  TEKST-WATERMERK
   // ============================================================
-  wmText.addEventListener('input', () => {
-    saveText(wmText.value);
-    updateFlow();
-    if (photos.length > 0 && hasWatermark()) debouncePreview();
-  });
+  if (wmText) {
+    wmText.addEventListener('input', () => {
+      saveText(wmText.value);
+      updateFlow();
+      if (photos.length > 0 && hasWatermark()) debouncePreview();
+    });
+  }
 
   // ============================================================
   //  LOGO
   // ============================================================
-  logoZone.addEventListener('click', () => logoInput.click());
-  changeLogoBtn.addEventListener('click', (e) => { e.stopPropagation(); logoInput.click(); });
-  logoInput.addEventListener('change', (e) => {
-    if (e.target.files && e.target.files[0]) loadLogo(e.target.files[0]);
-  });
-  logoZone.addEventListener('dragover', (e) => { e.preventDefault(); logoZone.classList.add('dragover'); });
-  logoZone.addEventListener('dragleave', () => logoZone.classList.remove('dragover'));
-  logoZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    logoZone.classList.remove('dragover');
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) loadLogo(e.dataTransfer.files[0]);
-  });
+  if (logoZone && logoInput) {
+    logoZone.addEventListener('click', () => logoInput.click());
+    logoInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) loadLogo(e.target.files[0]);
+    });
+    logoZone.addEventListener('dragover', (e) => { e.preventDefault(); logoZone.classList.add('dragover'); });
+    logoZone.addEventListener('dragleave', () => logoZone.classList.remove('dragover'));
+    logoZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      logoZone.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) loadLogo(e.dataTransfer.files[0]);
+    });
+  }
+
+  if (changeLogoBtn && logoInput) {
+    changeLogoBtn.addEventListener('click', (e) => { e.stopPropagation(); logoInput.click(); });
+  }
 
   function loadLogo(file) {
     if (!file.type || !file.type.startsWith('image/')) {
@@ -679,10 +716,10 @@
     const img = new Image();
     img.onload = () => {
       logoImage = img;
-      logoThumb.src = url;
-      logoName.textContent = file.name;
-      logoInfoRow.style.display = 'block';
-      logoZone.style.display = 'none';
+      if (logoThumb) logoThumb.src = url;
+      if (logoName) logoName.textContent = file.name;
+      if (logoInfoRow) logoInfoRow.style.display = 'block';
+      if (logoZone) logoZone.style.display = 'none';
 
       const reader = new FileReader();
       reader.onload = (ev) => {
@@ -705,10 +742,10 @@
     const img = new Image();
     img.onload = () => {
       logoImage = img;
-      logoThumb.src = stored.dataUrl;
-      logoName.textContent = stored.name;
-      logoInfoRow.style.display = 'block';
-      logoZone.style.display = 'none';
+      if (logoThumb) logoThumb.src = stored.dataUrl;
+      if (logoName) logoName.textContent = stored.name;
+      if (logoInfoRow) logoInfoRow.style.display = 'block';
+      if (logoZone) logoZone.style.display = 'none';
       updateFlow();
       if (photos.length > 0 && hasWatermark()) generatePreview();
     };
@@ -720,6 +757,7 @@
   //  SLIDERS
   // ============================================================
   function bindSlider(el, valEl, suffix) {
+    if (!el || !valEl) return;
     el.addEventListener('input', () => {
       valEl.textContent = el.value + suffix;
       if (photos.length > 0 && hasWatermark()) debouncePreview();
@@ -760,10 +798,9 @@
   }
 
   // ============================================================
-  //  TEKST NAAR CANVAS (voor tekst-watermerk)
+  //  TEKST NAAR CANVAS
   // ============================================================
   function createTextWatermarkImage(text, color, fontSize) {
-    // Maak een canvas met de tekst, zodat we het als afbeelding kunnen hergebruiken
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const font = 'bold ' + fontSize + 'px -apple-system, BlinkMacSystemFont, sans-serif';
@@ -790,7 +827,6 @@
   async function applyWatermark(baseImg) {
     const preset = PRESETS[currentPreset];
 
-    // Bepaal uitvoer-afmetingen
     let outW = baseImg.width;
     let outH = baseImg.height;
     if (preset.maxSide !== Infinity) {
@@ -808,15 +844,13 @@
     const ctx = canvas.getContext('2d');
     ctx.drawImage(baseImg, 0, 0, outW, outH);
 
-    // Bepaal de bron voor het watermerk
     let wmSource;
-    if (wmMode === 'logo') {
+    if (wmMode === 'logo' && logoImage) {
       wmSource = logoImage;
     } else {
-      // Tekst-watermerk: maak een canvas
       const baseDim = Math.min(outW, outH);
       const fontSize = Math.max(20, Math.round(baseDim * 0.05));
-      wmSource = createTextWatermarkImage(wmText.value.trim(), textColor, fontSize);
+      wmSource = createTextWatermarkImage(wmText.value.trim() || 'OpenWatermark', textColor, fontSize);
     }
 
     const wmRatio = wmSource.height / wmSource.width;
@@ -845,7 +879,7 @@
       canvas.toBlob(resolve, 'image/jpeg', 0.95)
     );
 
-    const payload = (payloadInput.value || 'OpenWatermark-standaard').trim();
+    const payload = (payloadInput && payloadInput.value ? payloadInput.value : 'OpenWatermark-standaard').trim();
 
     if (window.OpenWatermarkInvisible && payload) {
       try {
@@ -873,9 +907,11 @@
       const blob = await applyWatermark(img);
       revokePreviewUrl();
       previewUrl = URL.createObjectURL(blob);
-      preview.src = previewUrl;
-      preview.style.display = 'block';
-      previewEmpty.classList.add('hidden');
+      if (preview) {
+        preview.src = previewUrl;
+        preview.style.display = 'block';
+      }
+      if (previewEmpty) previewEmpty.classList.add('hidden');
     } catch (err) {
       setStatus(t('preview_error') + err.message, 'error');
     }
@@ -884,127 +920,129 @@
   // ============================================================
   //  DOWNLOAD
   // ============================================================
-  downloadBtn.addEventListener('click', async () => {
-    if (busy) return;
-    if (!hasWatermark() || photos.length === 0) return;
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', async () => {
+      if (busy) return;
+      if (!hasWatermark() || photos.length === 0) return;
 
-    busy = true;
-    updateFlow();
-    progressBar.classList.add('visible');
-    progressFill.style.width = '0%';
-
-    try {
-      // Verwerk alle foto's
-      const results = [];
-      for (let i = 0; i < photos.length; i++) {
-        setStatus(t('processing_one', i + 1, photos.length));
-        const p = photos[i];
-        const img = await loadImage(p.file);
-        const blob = await applyWatermark(img);
-        const baseName = p.file.name.replace(/\.[^.]+$/, '') || `foto_${i + 1}`;
-        results.push({ name: `${baseName}_watermerk.jpg`, blob });
-        progressFill.style.width = `${((i + 1) / photos.length) * 100}%`;
-        await new Promise(r => setTimeout(r, 0));
-      }
-
-      if (results.length === 1) {
-        // Directe download
-        const url = URL.createObjectURL(results[0].blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = results[0].name;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 60000);
-        setStatus(t('done_single'), 'success');
-      } else {
-        // ZIP
-        if (typeof JSZip === 'undefined') {
-          setStatus(t('no_jszip'), 'error');
-          busy = false;
-          updateFlow();
-          return;
-        }
-        setStatus(t('creating_zip'));
-        const zip = new JSZip();
-        const folder = zip.folder('OpenWatermark');
-        results.forEach(r => folder.file(r.name, r.blob));
-        const zipBlob = await zip.generateAsync({
-          type: 'blob',
-          compression: 'DEFLATE',
-          compressionOptions: { level: 6 }
-        });
-        const url = URL.createObjectURL(zipBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `OpenWatermark_${new Date().toISOString().slice(0, 10)}.zip`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 60000);
-        setStatus(t('done_multiple', results.length), 'success');
-      }
-
-      // Teller ophogen
-      addToCounter(results.length);
-
-      // Succes-flits
-      downloadBtn.classList.add('success-flash');
-      const originalText = downloadBtn.textContent;
-      downloadBtn.textContent = '\u2713';
-      setTimeout(() => {
-        downloadBtn.classList.remove('success-flash');
-        downloadBtn.textContent = originalText;
-        updateDownloadLabel();
-      }, 1800);
-
-      setStep(4);
-    } catch (err) {
-      console.error(err);
-      setStatus(t('error_prefix') + (err && err.message ? err.message : err), 'error');
-    } finally {
-      busy = false;
+      busy = true;
       updateFlow();
-      setTimeout(() => {
-        progressBar.classList.remove('visible');
-        progressFill.style.width = '0%';
-      }, 1200);
-    }
-  });
+      if (progressBar) progressBar.classList.add('visible');
+      if (progressFill) progressFill.style.width = '0%';
+
+      try {
+        const results = [];
+        for (let i = 0; i < photos.length; i++) {
+          setStatus(t('processing_one', i + 1, photos.length));
+          const p = photos[i];
+          const img = await loadImage(p.file);
+          const blob = await applyWatermark(img);
+          const baseName = p.file.name.replace(/\.[^.]+$/, '') || `foto_${i + 1}`;
+          results.push({ name: `${baseName}_watermerk.jpg`, blob });
+          if (progressFill) progressFill.style.width = `${((i + 1) / photos.length) * 100}%`;
+          await new Promise(r => setTimeout(r, 0));
+        }
+
+        if (results.length === 1) {
+          const url = URL.createObjectURL(results[0].blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = results[0].name;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 60000);
+          setStatus(t('done_single'), 'success');
+        } else {
+          if (typeof JSZip === 'undefined') {
+            setStatus(t('no_jszip'), 'error');
+            busy = false;
+            updateFlow();
+            return;
+          }
+          setStatus(t('creating_zip'));
+          const zip = new JSZip();
+          const folder = zip.folder('OpenWatermark');
+          results.forEach(r => folder.file(r.name, r.blob));
+          const zipBlob = await zip.generateAsync({
+            type: 'blob',
+            compression: 'DEFLATE',
+            compressionOptions: { level: 6 }
+          });
+          const url = URL.createObjectURL(zipBlob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `OpenWatermark_${new Date().toISOString().slice(0, 10)}.zip`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 60000);
+          setStatus(t('done_multiple', results.length), 'success');
+        }
+
+        addToCounter(results.length);
+
+        downloadBtn.classList.add('success-flash');
+        const originalText = downloadBtn.textContent;
+        downloadBtn.textContent = '\u2713';
+        setTimeout(() => {
+          downloadBtn.classList.remove('success-flash');
+          downloadBtn.textContent = originalText;
+          updateDownloadLabel();
+        }, 1800);
+
+        setStep(4);
+      } catch (err) {
+        console.error(err);
+        setStatus(t('error_prefix') + (err && err.message ? err.message : err), 'error');
+      } finally {
+        busy = false;
+        updateFlow();
+        setTimeout(() => {
+          if (progressBar) progressBar.classList.remove('visible');
+          if (progressFill) progressFill.style.width = '0%';
+        }, 1200);
+      }
+    });
+  }
 
   // ============================================================
   //  RESET
   // ============================================================
-  resetBtn.addEventListener('click', () => {
-    photos = [];
-    photoInput.value = '';
-    revokePreviewUrl();
-    preview.removeAttribute('src');
-    preview.style.display = 'none';
-    renderPhotoList();
-    setStatus('');
-    updateFlow();
-  });
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      photos = [];
+      if (photoInput) photoInput.value = '';
+      revokePreviewUrl();
+      if (preview) {
+        preview.removeAttribute('src');
+        preview.style.display = 'none';
+      }
+      renderPhotoList();
+      setStatus('');
+      updateFlow();
+    });
+  }
 
   // ============================================================
   //  PAYLOAD OPSLAAN
   // ============================================================
-  payloadInput.addEventListener('input', () => {
-    savePayload(payloadInput.value);
-  });
+  if (payloadInput) {
+    payloadInput.addEventListener('input', () => {
+      savePayload(payloadInput.value);
+    });
+  }
 
   // ============================================================
   //  INIT
   // ============================================================
   applyTranslations();
 
-  // Herstel waarden
   const savedPayload = loadPayloadValue();
-  if (savedPayload) payloadInput.value = savedPayload;
+  if (savedPayload && payloadInput) payloadInput.value = savedPayload;
 
   const savedText = loadTextValue();
-  if (savedText) wmText.value = savedText;
+  if (savedText && wmText) wmText.value = savedText;
 
   const savedMode = loadWmMode();
   setWmMode(savedMode);
@@ -1015,7 +1053,7 @@
   restoreLogo();
   updateCounterDisplay();
 
-  if (!window.OpenWatermarkInvisible) {
+  if (!window.OpenWatermarkInvisible && invisibleAlert) {
     invisibleAlert.classList.add('visible');
   }
 
