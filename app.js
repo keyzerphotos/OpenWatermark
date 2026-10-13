@@ -1,6 +1,5 @@
 /* OpenWatermark — app.js
- * Versie 0.3.0
- * MIT-licentie
+ * Versie 0.4.0 · MIT-licentie
  */
 (function () {
   'use strict';
@@ -24,12 +23,15 @@
       set_opacity: "Transparantie",
       set_rotation: "Rotatie",
       set_spacing: "Afstand",
+      set_payload: "Verificatiecode",
+      set_payload_hint: "bv. jouw@email.nl",
       result_title: "Resultaat",
       result_preview: "Voorbeeld (eerste foto)",
       result_download: "Download alle foto's (ZIP)",
       result_reset: "Alles wissen",
+      result_verify: "Controleer onzichtbaar watermerk",
       notice_strong: "Eerlijk:",
-      notice_text: " een zichtbaar watermerk maakt verwijdering lastiger, maar niet onmogelijk. Herhaling over de hele foto is moeilijker weg te poetsen dan één logo in een hoek. Voor echte herkomstbescherming is C2PA-metadata nodig — dat zit al in moderne camera's zoals Nikon Z9 en Canon R5 Mark II.",
+      notice_text: " een zichtbaar watermerk maakt verwijdering lastiger, maar niet onmogelijk. De onzichtbare laag overleeft JPEG-compressie en verkleining, maar is geen absolute garantie. Voor echte herkomstbescherming is C2PA-metadata nodig — dat zit al in moderne camera's zoals Nikon Z9 en Canon R5 Mark II.",
       footer_text: "OpenWatermark · Open source op",
       footer_privacy: "Je foto's blijven op je toestel. Niets wordt verstuurd.",
       max_photos: (max, skipped) => `Maximaal ${max} foto's per keer. ${skipped} overgeslagen.`,
@@ -38,7 +40,6 @@
       logo_must_be_image: "Logo moet een afbeelding zijn.",
       logo_load_error: "Logo kon niet geladen worden.",
       photo_load_error: "Foto kon niet geladen worden.",
-      processing: (n) => `Bezig met ${n} foto('s)...`,
       processing_one: (i, n) => `Foto ${i} van ${n}...`,
       creating_zip: "ZIP maken...",
       done_zip: (n) => `Klaar! ${n} foto('s) gedownload als ZIP.`,
@@ -46,6 +47,10 @@
       preview_error: "Fout bij voorbeeld: ",
       no_jszip: "ZIP-bibliotheek kon niet geladen worden. Controleer je internetverbinding.",
       too_many: (max) => `Maximaal ${max} foto's per keer.`,
+      too_small: "Deze foto is te klein voor een robuust onzichtbaar watermerk.",
+      verify_match: (c) => `Onzichtbaar watermerk gevonden (${Math.round(c * 100)}% overeenkomst).`,
+      verify_no_match: (c) => `Geen overeenkomst gevonden (${Math.round(c * 100)}%).`,
+      verify_prompt: "Laad eerst een foto en vul een verificatiecode in.",
     },
     en: {
       subtitle: "Protect your photos with your own logo. Everything local in your browser.",
@@ -62,12 +67,15 @@
       set_opacity: "Opacity",
       set_rotation: "Rotation",
       set_spacing: "Spacing",
+      set_payload: "Verification code",
+      set_payload_hint: "e.g. your@email.com",
       result_title: "Result",
       result_preview: "Preview (first photo)",
       result_download: "Download all photos (ZIP)",
       result_reset: "Clear all",
+      result_verify: "Check invisible watermark",
       notice_strong: "Honest:",
-      notice_text: " a visible watermark makes removal harder, but not impossible. Repeating across the whole photo is harder to erase than a single logo in a corner. For real provenance protection, C2PA metadata is needed — already built into modern cameras like the Nikon Z9 and Canon R5 Mark II.",
+      notice_text: " a visible watermark makes removal harder, but not impossible. The invisible layer survives JPEG compression and resizing, but is not an absolute guarantee. For real provenance protection, C2PA metadata is needed — already built into modern cameras like the Nikon Z9 and Canon R5 Mark II.",
       footer_text: "OpenWatermark · Open source on",
       footer_privacy: "Your photos stay on your device. Nothing is sent.",
       max_photos: (max, skipped) => `Maximum ${max} photos at a time. ${skipped} skipped.`,
@@ -76,7 +84,6 @@
       logo_must_be_image: "Logo must be an image.",
       logo_load_error: "Logo could not be loaded.",
       photo_load_error: "Photo could not be loaded.",
-      processing: (n) => `Processing ${n} photo(s)...`,
       processing_one: (i, n) => `Photo ${i} of ${n}...`,
       creating_zip: "Creating ZIP...",
       done_zip: (n) => `Done! ${n} photo(s) downloaded as ZIP.`,
@@ -84,6 +91,10 @@
       preview_error: "Preview error: ",
       no_jszip: "ZIP library could not be loaded. Check your internet connection.",
       too_many: (max) => `Maximum ${max} photos at a time.`,
+      too_small: "This photo is too small for a robust invisible watermark.",
+      verify_match: (c) => `Invisible watermark found (${Math.round(c * 100)}% match).`,
+      verify_no_match: (c) => `No match found (${Math.round(c * 100)}%).`,
+      verify_prompt: "Load a photo and enter a verification code first.",
     },
     de: {
       subtitle: "Schütze deine Fotos mit deinem eigenen Logo. Alles lokal im Browser.",
@@ -100,12 +111,15 @@
       set_opacity: "Transparenz",
       set_rotation: "Drehung",
       set_spacing: "Abstand",
+      set_payload: "Verifizierungscode",
+      set_payload_hint: "z.B. deine@email.de",
       result_title: "Ergebnis",
       result_preview: "Vorschau (erstes Foto)",
       result_download: "Alle Fotos herunterladen (ZIP)",
       result_reset: "Alles löschen",
+      result_verify: "Unsichtbares Wasserzeichen prüfen",
       notice_strong: "Ehrlich:",
-      notice_text: " ein sichtbares Wasserzeichen erschwert das Entfernen, macht es aber nicht unmöglich. Wiederholung über das ganze Foto ist schwerer zu entfernen als ein einzelnes Logo in einer Ecke. Für echten Herkunftsschutz ist C2PA-Metadaten nötig — bereits in modernen Kameras wie der Nikon Z9 und Canon R5 Mark II integriert.",
+      notice_text: " ein sichtbares Wasserzeichen erschwert das Entfernen, macht es aber nicht unmöglich. Die unsichtbare Ebene übersteht JPEG-Kompression und Verkleinerung, ist aber keine absolute Garantie. Für echten Herkunftsschutz ist C2PA-Metadaten nötig — bereits in modernen Kameras wie der Nikon Z9 und Canon R5 Mark II integriert.",
       footer_text: "OpenWatermark · Open Source auf",
       footer_privacy: "Deine Fotos bleiben auf deinem Gerät. Nichts wird gesendet.",
       max_photos: (max, skipped) => `Maximal ${max} Fotos pro Vorgang. ${skipped} übersprungen.`,
@@ -114,7 +128,6 @@
       logo_must_be_image: "Logo muss ein Bild sein.",
       logo_load_error: "Logo konnte nicht geladen werden.",
       photo_load_error: "Foto konnte nicht geladen werden.",
-      processing: (n) => `Verarbeite ${n} Foto(s)...`,
       processing_one: (i, n) => `Foto ${i} von ${n}...`,
       creating_zip: "ZIP wird erstellt...",
       done_zip: (n) => `Fertig! ${n} Foto(s) als ZIP heruntergeladen.`,
@@ -122,6 +135,10 @@
       preview_error: "Vorschaufehler: ",
       no_jszip: "ZIP-Bibliothek konnte nicht geladen werden. Prüfe deine Internetverbindung.",
       too_many: (max) => `Maximal ${max} Fotos pro Vorgang.`,
+      too_small: "Dieses Foto ist zu klein für ein robustes unsichtbares Wasserzeichen.",
+      verify_match: (c) => `Unsichtbares Wasserzeichen gefunden (${Math.round(c * 100)}% Übereinstimmung).`,
+      verify_no_match: (c) => `Keine Übereinstimmung gefunden (${Math.round(c * 100)}%).`,
+      verify_prompt: "Lade zuerst ein Foto und gib einen Verifizierungscode ein.",
     }
   };
 
@@ -137,10 +154,9 @@
       const saved = localStorage.getItem('ow_lang');
       if (saved && SUPPORTED.includes(saved)) return saved;
     } catch (_) {}
-    const browserLangs = (navigator.languages && navigator.languages.length)
-      ? navigator.languages
-      : [navigator.language || 'en'];
-    for (const lang of browserLangs) {
+    const langs = (navigator.languages && navigator.languages.length)
+      ? navigator.languages : [navigator.language || 'en'];
+    for (const lang of langs) {
       const code = String(lang).toLowerCase().split('-')[0];
       if (SUPPORTED.includes(code)) return code;
     }
@@ -159,6 +175,9 @@
     document.documentElement.lang = currentLang;
     document.querySelectorAll('[data-i18n]').forEach(el => {
       el.textContent = t(el.getAttribute('data-i18n'));
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
     });
     document.querySelectorAll('.lang-switch button').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.lang === currentLang);
@@ -197,6 +216,7 @@
   const statusEl = $('status');
   const downloadZipBtn = $('downloadZipBtn');
   const resetBtn = $('resetBtn');
+  const verifyBtn = $('verifyBtn');
   const progressBar = $('progressBar');
   const progressFill = $('progressFill');
 
@@ -204,6 +224,7 @@
   const opacity = $('opacity');
   const rotation = $('rotation');
   const spacing = $('spacing');
+  const payloadInput = $('payloadInput');
 
   const logoSizeVal = $('logoSizeVal');
   const opacityVal = $('opacityVal');
@@ -213,9 +234,9 @@
   // ============================================================
   //  STATE
   // ============================================================
-  let photos = [];          // [{ file, id }]
-  let logoImage = null;     // HTMLImageElement
-  let previewUrl = null;    // blob URL voor preview (om te kunnen revoken)
+  let photos = [];
+  let logoImage = null;
+  let previewUrl = null;
   let busy = false;
 
   // ============================================================
@@ -238,15 +259,11 @@
   });
 
   // ============================================================
-  //  FOTO'S TOEVOEGEN
+  //  FOTO'S
   // ============================================================
   photoZone.addEventListener('click', () => photoInput.click());
   photoInput.addEventListener('change', (e) => addPhotos(e.target.files));
-
-  photoZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    photoZone.classList.add('dragover');
-  });
+  photoZone.addEventListener('dragover', (e) => { e.preventDefault(); photoZone.classList.add('dragover'); });
   photoZone.addEventListener('dragleave', () => photoZone.classList.remove('dragover'));
   photoZone.addEventListener('drop', (e) => {
     e.preventDefault();
@@ -259,18 +276,10 @@
     if (files.length === 0) return;
 
     const remaining = MAX_PHOTOS - photos.length;
-    if (remaining <= 0) {
-      setStatus(t('too_many', MAX_PHOTOS), 'error');
-      return;
-    }
+    if (remaining <= 0) { setStatus(t('too_many', MAX_PHOTOS), 'error'); return; }
     const toAdd = files.slice(0, remaining);
 
-    toAdd.forEach(file => {
-      photos.push({
-        file,
-        id: Math.random().toString(36).slice(2, 10)
-      });
-    });
+    toAdd.forEach(file => photos.push({ file, id: Math.random().toString(36).slice(2, 10) }));
 
     if (files.length > toAdd.length) {
       setStatus(t('max_photos', MAX_PHOTOS, files.length - toAdd.length), 'error');
@@ -296,10 +305,7 @@
 
   function renderPhotoList() {
     photoList.innerHTML = '';
-    if (photos.length === 0) {
-      photoList.classList.remove('visible');
-      return;
-    }
+    if (photos.length === 0) { photoList.classList.remove('visible'); return; }
     photoList.classList.add('visible');
 
     const frag = document.createDocumentFragment();
@@ -321,10 +327,7 @@
       remove.className = 'remove';
       remove.textContent = '✕';
       remove.setAttribute('role', 'button');
-      remove.addEventListener('click', (e) => {
-        e.stopPropagation();
-        removePhoto(p.id);
-      });
+      remove.addEventListener('click', (e) => { e.stopPropagation(); removePhoto(p.id); });
 
       item.appendChild(thumb);
       item.appendChild(name);
@@ -335,21 +338,12 @@
   }
 
   // ============================================================
-  //  LOGO TOEVOEGEN
+  //  LOGO
   // ============================================================
   logoZone.addEventListener('click', () => logoInput.click());
-  changeLogoBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    logoInput.click();
-  });
-  logoInput.addEventListener('change', (e) => {
-    if (e.target.files && e.target.files[0]) loadLogo(e.target.files[0]);
-  });
-
-  logoZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    logoZone.classList.add('dragover');
-  });
+  changeLogoBtn.addEventListener('click', (e) => { e.stopPropagation(); logoInput.click(); });
+  logoInput.addEventListener('change', (e) => { if (e.target.files && e.target.files[0]) loadLogo(e.target.files[0]); });
+  logoZone.addEventListener('dragover', (e) => { e.preventDefault(); logoZone.classList.add('dragover'); });
   logoZone.addEventListener('dragleave', () => logoZone.classList.remove('dragover'));
   logoZone.addEventListener('drop', (e) => {
     e.preventDefault();
@@ -374,10 +368,7 @@
       updateDownloadState();
       if (photos.length > 0) generatePreview();
     };
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      setStatus(t('logo_load_error'), 'error');
-    };
+    img.onerror = () => { URL.revokeObjectURL(url); setStatus(t('logo_load_error'), 'error'); };
     img.src = url;
   }
 
@@ -402,33 +393,37 @@
   }
 
   // ============================================================
-  //  AFBEELDING LADEN
+  //  HELPERS
   // ============================================================
   function loadImage(file) {
     return new Promise((resolve, reject) => {
       const img = new Image();
       const url = URL.createObjectURL(file);
-      img.onload = () => {
-        URL.revokeObjectURL(url);
-        resolve(img);
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        reject(new Error('Image load failed'));
-      };
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image load failed')); };
+      img.src = url;
+    });
+  }
+
+  function loadImageFromBlob(blob) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(blob);
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Blob load failed')); };
       img.src = url;
     });
   }
 
   // ============================================================
-  //  WATERMERK TOEPASSEN
+  //  WATERMERK TOEPASSEN (zichtbaar + onzichtbaar)
   // ============================================================
   async function applyWatermark(baseImg) {
+    // ---- Stap 1: zichtbaar watermerk ----
     const canvas = document.createElement('canvas');
     canvas.width = baseImg.width;
     canvas.height = baseImg.height;
     const ctx = canvas.getContext('2d');
-
     ctx.drawImage(baseImg, 0, 0);
 
     const logoW = (canvas.width * parseInt(logoSize.value, 10)) / 100;
@@ -452,17 +447,33 @@
     }
     ctx.globalAlpha = 1;
 
-    return new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', JPEG_QUALITY));
+    const visibleBlob = await new Promise((resolve) =>
+      canvas.toBlob(resolve, 'image/jpeg', 0.95)
+    );
+
+    // ---- Stap 2: onzichtbaar watermerk (DCT) ----
+    const payload = (payloadInput.value || 'OpenWatermark-standaard').trim();
+
+    if (window.OpenWatermarkInvisible && payload) {
+      try {
+        const visibleImg = await loadImageFromBlob(visibleBlob);
+        return await window.OpenWatermarkInvisible.embed(visibleImg, payload);
+      } catch (err) {
+        // Als onzichtbaar watermerken mislukt (bv. afbeelding te klein),
+        // lever dan de zichtbare versie zonder onzichtbare laag.
+        console.warn('Onzichtbaar watermerk overgeslagen:', err.message);
+        return visibleBlob;
+      }
+    }
+
+    return visibleBlob;
   }
 
   // ============================================================
   //  PREVIEW
   // ============================================================
   function revokePreviewUrl() {
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-      previewUrl = null;
-    }
+    if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
   }
 
   async function generatePreview() {
@@ -498,72 +509,4 @@
 
     try {
       const zip = new JSZip();
-      const folder = zip.folder('OpenWatermark');
-
-      for (let i = 0; i < photos.length; i++) {
-        setStatus(t('processing_one', i + 1, photos.length));
-        const p = photos[i];
-        const img = await loadImage(p.file);
-        const blob = await applyWatermark(img);
-        const baseName = p.file.name.replace(/\.[^.]+$/, '') || `foto_${i + 1}`;
-        folder.file(`${baseName}_watermerk.jpg`, blob);
-        progressFill.style.width = `${((i + 1) / photos.length) * 100}%`;
-        // Laat de UI ademen tussen foto's
-        await new Promise(r => setTimeout(r, 0));
-      }
-
-      setStatus(t('creating_zip'));
-      const zipBlob = await zip.generateAsync({
-        type: 'blob',
-        compression: 'DEFLATE',
-        compressionOptions: { level: 6 }
-      });
-
-      const url = URL.createObjectURL(zipBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `OpenWatermark_${new Date().toISOString().slice(0, 10)}.zip`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
-
-      setStatus(t('done_zip', photos.length), 'success');
-    } catch (err) {
-      console.error(err);
-      setStatus(t('error_prefix') + (err && err.message ? err.message : err), 'error');
-    } finally {
-      busy = false;
-      updateDownloadState();
-      setTimeout(() => {
-        progressBar.classList.remove('visible');
-        progressFill.style.width = '0%';
-      }, 1200);
-    }
-  });
-
-  // ============================================================
-  //  RESET
-  // ============================================================
-  resetBtn.addEventListener('click', () => {
-    photos = [];
-    photoInput.value = '';
-    logoInput.value = '';
-    logoImage = null;
-    revokePreviewUrl();
-    preview.removeAttribute('src');
-    renderPhotoList();
-    logoInfoRow.style.display = 'none';
-    logoZone.style.display = 'block';
-    logoThumb.removeAttribute('src');
-    resultCard.style.display = 'none';
-    setStatus('');
-    updateDownloadState();
-  });
-
-  // ============================================================
-  //  INIT
-  // ============================================================
-  applyTranslations();
-  updateDownloadState();
-})();
+      const folder = zip.folder('Open
