@@ -1,6 +1,7 @@
 /* OpenWatermark - app.js
- * Versie 2.2.0 - MIT-licentie
+ * Versie 2.3.0 - MIT-licentie
  * Lightroom-stijl. Alleen Nederlands. Dubbelklik slider = reset.
+ * Twee info-knoppen: rondje rechtsboven + tekst-link in footer.
  */
 (function () {
   'use strict';
@@ -154,7 +155,9 @@
   const progressBar = $('progressBar');
   const progressFill = $('progressFill');
   const invisibleAlert = $('invisibleAlert');
+
   const infoBtn = $('infoBtn');
+  const infoBtnFooter = $('infoBtnFooter');
   const infoOverlay = $('infoOverlay');
   const infoClose = $('infoClose');
 
@@ -369,10 +372,12 @@
     });
   }
 
-  // ---------- INFO ----------
-  if (infoBtn && infoOverlay) {
-    infoBtn.addEventListener('click', () => infoOverlay.classList.add('visible'));
+  // ---------- INFO (twee knoppen) ----------
+  function openInfo() {
+    if (infoOverlay) infoOverlay.classList.add('visible');
   }
+  if (infoBtn) infoBtn.addEventListener('click', openInfo);
+  if (infoBtnFooter) infoBtnFooter.addEventListener('click', openInfo);
   if (infoClose && infoOverlay) {
     infoClose.addEventListener('click', () => infoOverlay.classList.remove('visible'));
   }
@@ -533,7 +538,7 @@
     img.src = stored.dataUrl;
   }
 
-  // ---------- SLIDERS met dubbelklik-reset ----------
+  // ---------- SLIDERS ----------
   function bindSlider(el, valEl, suffix) {
     if (!el || !valEl) return;
 
