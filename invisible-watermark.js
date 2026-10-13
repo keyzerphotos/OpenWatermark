@@ -1,5 +1,5 @@
-/* OpenWatermark — Onzichtbaar watermerk (DCT)
- * Versie 1.0.0 · MIT-licentie
+/* OpenWatermark - Onzichtbaar watermerk (DCT)
+ * Versie 1.0.0 - MIT-licentie
  */
 (function () {
   'use strict';
