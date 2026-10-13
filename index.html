@@ -42,7 +42,6 @@
   html {
     background: var(--bg);
     -webkit-text-size-adjust: 100%;
-    scroll-behavior: smooth;
   }
 
   body {
@@ -52,7 +51,6 @@
     -webkit-font-smoothing: antialiased;
     margin: 0;
     min-height: 100vh;
-    overflow-x: hidden;
   }
 
   .wrapper {
@@ -61,7 +59,6 @@
     padding: calc(24px + var(--safe-top)) 16px calc(60px + var(--safe-bottom));
   }
 
-  /* ---------- Header ---------- */
   header {
     text-align: center;
     margin-bottom: 28px;
@@ -99,7 +96,6 @@
     margin: 0 auto;
   }
 
-  /* ---------- Stap-indicator ---------- */
   .steps {
     display: flex;
     align-items: center;
@@ -163,7 +159,6 @@
     z-index: 1;
   }
 
-  /* ---------- Kaarten ---------- */
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -215,7 +210,6 @@
     font-weight: 500;
   }
 
-  /* ---------- Drop zones ---------- */
   .drop-zone {
     border: 2px dashed var(--border);
     border-radius: var(--radius-sm);
@@ -243,7 +237,6 @@
   .drop-label { font-size: 0.92rem; font-weight: 600; }
   .drop-hint { font-size: 0.72rem; color: var(--text-muted); }
 
-  /* ---------- Foto-lijst ---------- */
   .photo-list {
     margin-top: 12px;
     max-height: 240px;
@@ -285,7 +278,6 @@
     color: var(--danger);
   }
 
-  /* Foto-teller */
   .photo-counter {
     font-size: 0.75rem;
     color: var(--text-dim);
@@ -299,7 +291,6 @@
   .photo-counter.visible { display: block; }
   .photo-counter strong { color: var(--accent); }
 
-  /* ---------- Logo ---------- */
   .logo-row {
     display: flex; align-items: center; gap: 14px;
     padding: 12px;
@@ -318,8 +309,21 @@
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   .logo-info .meta { color: var(--text-muted); font-size: 0.7rem; }
+  .logo-info .meta.saved { color: var(--accent); }
 
-  /* ---------- Sliders ---------- */
+  .logo-saved-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(240, 180, 41, 0.12);
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-top: 4px;
+  }
+
   .slider-row {
     display: flex;
     align-items: center;
@@ -375,7 +379,6 @@
     flex-shrink: 0;
   }
 
-  /* ---------- Text input ---------- */
   .text-input {
     flex: 1;
     padding: 10px 14px;
@@ -400,7 +403,52 @@
     padding-left: 2px;
   }
 
-  /* ---------- Preview ---------- */
+  .field-details {
+    flex-basis: 100%;
+    margin-top: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .field-details summary {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+  }
+  .field-details summary::-webkit-details-marker { display: none; }
+  .field-details summary::after {
+    content: '+';
+    font-size: 1rem;
+    color: var(--text-dim);
+  }
+  .field-details[open] summary::after {
+    content: '−';
+  }
+  .field-details-body {
+    padding: 0 14px 14px;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+  .field-details-body p { margin-bottom: 8px; }
+  .field-details-body p:last-child { margin-bottom: 0; }
+  .field-details-body strong { color: var(--text); font-weight: 600; }
+  .field-details-body code {
+    background: var(--surface-3);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.68rem;
+    color: var(--accent);
+  }
+
   .preview-wrap {
     border-radius: var(--radius-sm);
     overflow: hidden;
@@ -428,7 +476,6 @@
   }
   .preview-empty.hidden { display: none; }
 
-  /* ---------- Buttons ---------- */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -472,7 +519,6 @@
     flex-shrink: 0;
   }
 
-  /* ---------- Actiebalk ---------- */
   .action-bar {
     display: none;
     margin-top: 20px;
@@ -484,7 +530,6 @@
   }
   .action-bar .btn { flex: 1; }
 
-  /* ---------- Status ---------- */
   .status {
     font-size: 0.82rem;
     color: var(--text-dim);
@@ -498,7 +543,6 @@
   .status.error { color: var(--danger); font-weight: 600; }
   .status.warning { color: var(--warning); font-weight: 600; }
 
-  /* ---------- Progress ---------- */
   .progress-bar {
     width: 100%;
     height: 5px;
@@ -516,7 +560,6 @@
     transition: width 0.2s;
   }
 
-  /* ---------- Notice ---------- */
   .notice {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -530,7 +573,6 @@
   }
   .notice strong { color: var(--accent); font-weight: 700; }
 
-  /* ---------- Waarschuwing ---------- */
   .alert {
     display: none;
     background: rgba(251, 191, 36, 0.08);
@@ -544,7 +586,6 @@
   }
   .alert.visible { display: block; }
 
-  /* ---------- Footer ---------- */
   footer {
     margin-top: 28px;
     font-size: 0.7rem;
@@ -555,7 +596,6 @@
   }
   footer a { color: var(--accent); text-decoration: none; }
 
-  /* ---------- Mobiel ---------- */
   @media (max-width: 520px) {
     .wrapper { padding-left: 12px; padding-right: 12px; }
     h1 { font-size: 1.3rem; }
@@ -612,10 +652,8 @@
     </div>
   </div>
 
-  <!-- Waarschuwing als onzichtbare laag niet geladen is -->
   <div class="alert" id="invisibleAlert" data-i18n="invisible_alert"></div>
 
-  <!-- Stap 1: Foto's -->
   <div class="card" id="cardPhotos">
     <div class="card-head">
       <div class="card-num">1</div>
@@ -634,7 +672,6 @@
     <div class="photo-counter" id="photoCounter"></div>
   </div>
 
-  <!-- Stap 2: Logo -->
   <div class="card locked" id="cardLogo">
     <div class="card-head">
       <div class="card-num">2</div>
@@ -654,14 +691,14 @@
         <img id="logoThumb" class="logo-thumb" alt="">
         <div class="logo-info">
           <div class="name" id="logoName">logo.png</div>
-          <div class="meta" data-i18n="logo_ready"></div>
+          <div class="meta" id="logoMeta" data-i18n="logo_ready"></div>
+          <div class="logo-saved-badge" id="logoSavedBadge" style="display:none;" data-i18n="logo_saved"></div>
         </div>
         <button class="btn btn-secondary btn-small" id="changeLogoBtn" data-i18n="logo_change"></button>
       </div>
     </div>
   </div>
 
-  <!-- Stap 3: Instellingen -->
   <div class="card locked" id="cardSettings">
     <div class="card-head">
       <div class="card-num">3</div>
@@ -694,10 +731,13 @@
       <label data-i18n="set_payload"></label>
       <input type="text" id="payloadInput" class="text-input" data-i18n-placeholder="set_payload_hint">
       <div class="field-hint" data-i18n="set_payload_help" style="flex-basis: 100%;"></div>
+      <details class="field-details">
+        <summary data-i18n="set_payload_more"></summary>
+        <div class="field-details-body" data-i18n-html="set_payload_explanation"></div>
+      </details>
     </div>
   </div>
 
-  <!-- Stap 4: Resultaat -->
   <div class="card locked" id="cardResult">
     <div class="card-head">
       <div class="card-num">4</div>
@@ -716,7 +756,6 @@
     </div>
   </div>
 
-  <!-- Actiebalk -->
   <div class="action-bar" id="actionBar">
     <div class="action-bar-inner">
       <button class="btn btn-secondary" id="resetBtn" data-i18n="result_reset"></button>
