@@ -1,5 +1,5 @@
 /* OpenWatermark — app.js
- * Versie 0.6.0 · MIT-licentie
+ * Versie 0.7.0 · MIT-licentie
  */
 (function () {
   'use strict';
@@ -152,7 +152,7 @@
   const MAX_PHOTOS = 100;
 
   // ============================================================
-  //  TAAL (automatisch via browser)
+  //  TAAL
   // ============================================================
   function detectLanguage() {
     const langs = (navigator.languages && navigator.languages.length)
@@ -194,7 +194,6 @@
   // ============================================================
   const $ = (id) => document.getElementById(id);
 
-  const cardPhotos = $('cardPhotos');
   const cardLogo = $('cardLogo');
   const cardSettings = $('cardSettings');
   const cardResult = $('cardResult');
