@@ -1,5 +1,5 @@
 /* OpenWatermark — app.js
- * Versie 0.5.0 · MIT-licentie
+ * Versie 0.6.0 · MIT-licentie
  */
 (function () {
   'use strict';
@@ -52,7 +52,7 @@
       error_prefix: "Fout: ",
       preview_error: "Fout bij voorbeeld: ",
       no_jszip: "ZIP-bibliotheek kon niet geladen worden. Controleer je internetverbinding.",
-      too_many: (max) => `Maximaal ${max} foto's per keer.`,
+      too_many: (max) => `Maximaal ${max} foto's per keer.`
     },
     en: {
       subtitle: "Protect your photos with your own logo. Everything local in your browser.",
@@ -98,7 +98,7 @@
       error_prefix: "Error: ",
       preview_error: "Preview error: ",
       no_jszip: "ZIP library could not be loaded. Check your internet connection.",
-      too_many: (max) => `Maximum ${max} photos at a time.`,
+      too_many: (max) => `Maximum ${max} photos at a time.`
     },
     de: {
       subtitle: "Schütze deine Fotos mit deinem eigenen Logo. Alles lokal im Browser.",
@@ -144,7 +144,7 @@
       error_prefix: "Fehler: ",
       preview_error: "Vorschaufehler: ",
       no_jszip: "ZIP-Bibliothek konnte nicht geladen werden. Prüfe deine Internetverbindung.",
-      too_many: (max) => `Maximal ${max} Fotos pro Vorgang.`,
+      too_many: (max) => `Maximal ${max} Fotos pro Vorgang.`
     }
   };
 
@@ -152,15 +152,12 @@
   const MAX_PHOTOS = 100;
 
   // ============================================================
-  //  TAAL
+  //  TAAL (automatisch via browser)
   // ============================================================
   function detectLanguage() {
-    try {
-      const saved = localStorage.getItem('ow_lang');
-      if (saved && SUPPORTED.includes(saved)) return saved;
-    } catch (_) {}
     const langs = (navigator.languages && navigator.languages.length)
-      ? navigator.languages : [navigator.language || 'en'];
+      ? navigator.languages
+      : [navigator.language || 'en'];
     for (const lang of langs) {
       const code = String(lang).toLowerCase().split('-')[0];
       if (SUPPORTED.includes(code)) return code;
@@ -168,7 +165,7 @@
     return 'en';
   }
 
-  let currentLang = detectLanguage();
+  const currentLang = detectLanguage();
 
   function t(key, ...args) {
     const dict = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
@@ -184,22 +181,12 @@
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
       el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
     });
-    document.querySelectorAll('.lang-switch button').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.lang === currentLang);
-    });
     const titles = {
       nl: "OpenWatermark — Bescherm je foto's",
       en: "OpenWatermark — Protect your photos",
       de: "OpenWatermark — Schütze deine Fotos"
     };
     document.title = titles[currentLang] || titles.en;
-  }
-
-  function setLanguage(lang) {
-    if (!SUPPORTED.includes(lang)) return;
-    currentLang = lang;
-    try { localStorage.setItem('ow_lang', lang); } catch (_) {}
-    applyTranslations();
   }
 
   // ============================================================
@@ -265,12 +252,9 @@
     const hasLogo = !!logoImage;
     const hasAll = hasPhotos && hasLogo;
 
-    // Foto's: altijd open
-    // Logo: open zodra er foto's zijn
     cardLogo.classList.toggle('locked', !hasPhotos);
     cardLogo.classList.toggle('done', hasPhotos && hasLogo);
 
-    // Instellingen + resultaat: open zodra er logo én foto's zijn
     cardSettings.classList.toggle('locked', !hasAll);
     cardResult.classList.toggle('locked', !hasAll);
     cardResult.classList.toggle('done', hasAll);
@@ -287,13 +271,6 @@
     statusEl.textContent = msg || '';
     statusEl.className = 'status' + (type ? ' ' + type : '');
   }
-
-  // ============================================================
-  //  TAALSCHAKELAAR
-  // ============================================================
-  document.querySelectorAll('.lang-switch button').forEach(btn => {
-    btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
-  });
 
   // ============================================================
   //  FOTO'S
