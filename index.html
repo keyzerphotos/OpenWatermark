@@ -13,7 +13,6 @@
     --surface-2: #17171c;
     --surface-3: #1f1f26;
     --border: #26262e;
-    --border-active: #3a3a46;
     --text: #f2f2f5;
     --text-dim: #8a8a96;
     --text-muted: #5a5a66;
@@ -25,63 +24,33 @@
     --danger: #f87171;
     --radius: 14px;
     --radius-sm: 10px;
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-  html {
-    background: var(--bg);
-    -webkit-text-size-adjust: 100%;
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  body {
+  html, body {
     background: var(--bg);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
-    min-height: 100vh;
     -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
     overflow-x: hidden;
+    touch-action: pan-y;
+  }
+
+  body {
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: calc(20px + var(--safe-top)) 16px calc(140px + var(--safe-bottom));
-  }
-
-  /* ---------- Taalswitch ---------- */
-  .lang-switch {
-    position: fixed;
-    top: calc(14px + var(--safe-top));
-    right: 14px;
-    display: flex;
-    gap: 2px;
-    background: rgba(17, 17, 20, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 3px;
-    z-index: 100;
-  }
-  .lang-switch button {
-    background: transparent;
-    border: none;
-    color: var(--text-dim);
-    cursor: pointer;
-    padding: 6px 10px;
-    border-radius: 7px;
-    font-family: inherit;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    transition: all 0.15s;
-    min-width: 34px;
-  }
-  .lang-switch button.active {
-    background: var(--accent);
-    color: #08080a;
+    padding: calc(24px + var(--safe-top)) 16px calc(60px + var(--safe-bottom));
   }
 
   /* ---------- Header ---------- */
@@ -90,7 +59,6 @@
     max-width: 720px;
     text-align: center;
     margin-bottom: 28px;
-    margin-top: 40px;
   }
   .logo {
     display: inline-flex;
@@ -262,27 +230,17 @@
     gap: 8px;
     min-height: 120px;
   }
-  .drop-zone:hover, .drop-zone:active {
+  .drop-zone:active {
     border-color: var(--accent);
     background: rgba(240, 180, 41, 0.05);
   }
   .drop-zone.dragover {
     border-color: var(--accent);
     background: rgba(240, 180, 41, 0.08);
-    transform: scale(1.01);
   }
-  .drop-icon {
-    font-size: 1.8rem;
-    opacity: 0.8;
-  }
-  .drop-label {
-    font-size: 0.92rem;
-    font-weight: 600;
-  }
-  .drop-hint {
-    font-size: 0.72rem;
-    color: var(--text-muted);
-  }
+  .drop-icon { font-size: 1.8rem; opacity: 0.8; }
+  .drop-label { font-size: 0.92rem; font-weight: 600; }
+  .drop-hint { font-size: 0.72rem; color: var(--text-muted); }
 
   /* ---------- Foto-lijst ---------- */
   .photo-list {
@@ -304,31 +262,20 @@
     font-size: 0.78rem;
   }
   .photo-item .thumb {
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
-    object-fit: cover;
-    background: #000;
-    flex-shrink: 0;
+    width: 36px; height: 36px;
+    border-radius: 6px; object-fit: cover;
+    background: #000; flex-shrink: 0;
   }
   .photo-item .name {
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    flex: 1; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
   }
   .photo-item .remove {
-    color: var(--text-muted);
-    cursor: pointer;
-    padding: 6px 8px;
-    font-size: 1rem;
-    border-radius: 6px;
-    transition: all 0.15s;
-    min-width: 34px;
-    min-height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    color: var(--text-muted); cursor: pointer;
+    padding: 6px 8px; font-size: 1rem;
+    border-radius: 6px; transition: all 0.15s;
+    min-width: 34px; min-height: 34px;
+    display: flex; align-items: center; justify-content: center;
   }
   .photo-item .remove:active {
     background: rgba(248, 113, 113, 0.15);
@@ -337,47 +284,34 @@
 
   /* ---------- Logo ---------- */
   .logo-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+    display: flex; align-items: center; gap: 14px;
     padding: 12px;
     background: var(--surface-2);
     border-radius: var(--radius-sm);
   }
   .logo-thumb {
-    width: 56px;
-    height: 56px;
-    object-fit: contain;
+    width: 56px; height: 56px; object-fit: contain;
     background: repeating-conic-gradient(#1f1f26 0% 25%, #17171c 0% 50%) 50% / 12px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    padding: 4px;
-    flex-shrink: 0;
+    border-radius: 8px; border: 1px solid var(--border);
+    padding: 4px; flex-shrink: 0;
   }
   .logo-info { flex: 1; min-width: 0; font-size: 0.8rem; }
   .logo-info .name {
-    font-weight: 600;
-    margin-bottom: 2px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    font-weight: 600; margin-bottom: 2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   .logo-info .meta { color: var(--text-muted); font-size: 0.7rem; }
 
   /* ---------- Sliders ---------- */
   .slider-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    display: flex; align-items: center; gap: 12px;
     padding: 14px 0;
     border-bottom: 1px solid var(--border);
   }
   .slider-row:last-child { border-bottom: none; }
   .slider-row label {
-    font-size: 0.82rem;
-    color: var(--text-dim);
-    min-width: 100px;
-    font-weight: 500;
+    font-size: 0.82rem; color: var(--text-dim);
+    min-width: 100px; font-weight: 500;
   }
   .slider-row input[type="range"] {
     flex: 1;
@@ -388,12 +322,12 @@
     border-radius: 2px;
     outline: none;
     min-width: 0;
+    touch-action: pan-y;
   }
   .slider-row input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 22px;
-    height: 22px;
+    width: 22px; height: 22px;
     background: var(--accent);
     border-radius: 50%;
     border: 2px solid var(--surface);
@@ -401,20 +335,16 @@
     cursor: pointer;
   }
   .slider-row input[type="range"]::-moz-range-thumb {
-    width: 22px;
-    height: 22px;
+    width: 22px; height: 22px;
     background: var(--accent);
     border-radius: 50%;
     border: 2px solid var(--surface);
     cursor: pointer;
   }
   .slider-row .value {
-    font-size: 0.75rem;
-    color: var(--accent);
-    min-width: 46px;
-    text-align: right;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
+    font-size: 0.75rem; color: var(--accent);
+    min-width: 46px; text-align: right;
+    font-weight: 700; font-variant-numeric: tabular-nums;
   }
 
   /* ---------- Text input ---------- */
@@ -443,37 +373,26 @@
     border: 1px solid var(--border);
     background: var(--surface-2);
   }
-  .preview-wrap img {
-    width: 100%;
-    display: block;
-  }
+  .preview-wrap img { width: 100%; display: block; }
   .preview-label {
-    font-size: 0.68rem;
-    color: var(--text-muted);
+    font-size: 0.68rem; color: var(--text-muted);
     padding: 8px 12px;
     background: var(--surface-2);
     border-bottom: 1px solid var(--border);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-weight: 600;
+    letter-spacing: 0.06em; font-weight: 600;
   }
 
   /* ---------- Buttons ---------- */
   .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    display: inline-flex; align-items: center; justify-content: center;
     gap: 8px;
     padding: 15px 22px;
-    border: none;
-    border-radius: 12px;
-    font-size: 0.92rem;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: inherit;
+    border: none; border-radius: 12px;
+    font-size: 0.92rem; font-weight: 700;
+    cursor: pointer; font-family: inherit;
     transition: all 0.15s;
-    width: 100%;
-    min-height: 50px;
+    width: 100%; min-height: 50px;
     letter-spacing: -0.01em;
   }
   .btn:active { transform: scale(0.985); }
@@ -483,9 +402,6 @@
     color: #08080a;
     box-shadow: 0 4px 20px var(--accent-glow);
   }
-  .btn-primary:not(:disabled):hover {
-    box-shadow: 0 6px 28px rgba(240, 180, 41, 0.3);
-  }
   .btn-secondary {
     background: var(--surface-2);
     color: var(--text);
@@ -494,36 +410,19 @@
   .btn-small {
     padding: 9px 14px;
     font-size: 0.78rem;
-    width: auto;
-    min-height: 40px;
+    width: auto; min-height: 40px;
     border-radius: 9px;
   }
 
-  /* ---------- Actiebalk ---------- */
+  /* ---------- Actiebalk (in-flow) ---------- */
   .action-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 14px 16px calc(14px + var(--safe-bottom));
-    background: linear-gradient(to top, var(--bg) 60%, rgba(8, 8, 10, 0.9) 100%);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    display: flex;
-    gap: 10px;
-    z-index: 90;
-    transform: translateY(120%);
-    transition: transform 0.3s ease;
-    pointer-events: none;
-  }
-  .action-bar.visible {
-    transform: translateY(0);
-    pointer-events: auto;
-  }
-  .action-bar-inner {
     width: 100%;
     max-width: 720px;
-    margin: 0 auto;
+    margin-top: 20px;
+    display: none;
+  }
+  .action-bar.visible { display: block; }
+  .action-bar-inner {
     display: flex;
     gap: 10px;
   }
@@ -531,13 +430,10 @@
 
   /* ---------- Status ---------- */
   .status {
-    font-size: 0.82rem;
-    color: var(--text-dim);
-    text-align: center;
-    min-height: 1.4em;
+    font-size: 0.82rem; color: var(--text-dim);
+    text-align: center; min-height: 1.4em;
     margin: 16px 0;
-    width: 100%;
-    max-width: 720px;
+    width: 100%; max-width: 720px;
     padding: 0 12px;
     transition: color 0.2s;
   }
@@ -546,11 +442,9 @@
 
   /* ---------- Progress ---------- */
   .progress-bar {
-    width: 100%;
-    height: 5px;
+    width: 100%; height: 5px;
     background: var(--border);
-    border-radius: 3px;
-    overflow: hidden;
+    border-radius: 3px; overflow: hidden;
     margin-top: 12px;
     display: none;
   }
@@ -558,21 +452,18 @@
   .progress-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--accent), var(--accent-hi));
-    width: 0%;
-    transition: width 0.2s;
+    width: 0%; transition: width 0.2s;
   }
 
   /* ---------- Notice ---------- */
   .notice {
-    width: 100%;
-    max-width: 720px;
+    width: 100%; max-width: 720px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-left: 3px solid var(--accent);
     border-radius: 10px;
     padding: 14px 16px;
-    font-size: 0.75rem;
-    color: var(--text-dim);
+    font-size: 0.75rem; color: var(--text-dim);
     line-height: 1.6;
     margin-top: 20px;
   }
@@ -581,14 +472,11 @@
   /* ---------- Footer ---------- */
   footer {
     margin-top: 28px;
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    text-align: center;
-    line-height: 1.7;
+    font-size: 0.7rem; color: var(--text-muted);
+    text-align: center; line-height: 1.7;
     padding: 0 12px;
   }
   footer a { color: var(--accent); text-decoration: none; }
-  footer a:hover { text-decoration: underline; }
 
   /* ---------- Mobiel ---------- */
   @media (max-width: 520px) {
@@ -607,19 +495,12 @@
     .action-bar-inner { flex-direction: column; }
   }
 
-  /* ---------- Toegankelijkheid ---------- */
   @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; animation: none !important; }
   }
 </style>
 </head>
 <body>
-
-<div class="lang-switch">
-  <button data-lang="nl">NL</button>
-  <button data-lang="en">EN</button>
-  <button data-lang="de">DE</button>
-</div>
 
 <header>
   <div class="logo">
@@ -632,23 +513,22 @@
 <div class="steps" id="steps">
   <div class="step" data-step="1">
     <div class="step-dot">1</div>
-    <div class="step-label" data-i18n="step_photos">Foto's</div>
+    <div class="step-label" data-i18n="step_photos"></div>
   </div>
   <div class="step" data-step="2">
     <div class="step-dot">2</div>
-    <div class="step-label" data-i18n="step_logo">Logo</div>
+    <div class="step-label" data-i18n="step_logo"></div>
   </div>
   <div class="step" data-step="3">
     <div class="step-dot">3</div>
-    <div class="step-label" data-i18n="step_settings">Instellen</div>
+    <div class="step-label" data-i18n="step_settings"></div>
   </div>
   <div class="step" data-step="4">
     <div class="step-dot">4</div>
-    <div class="step-label" data-i18n="step_download">Klaar</div>
+    <div class="step-label" data-i18n="step_download"></div>
   </div>
 </div>
 
-<!-- Stap 1: Foto's -->
 <div class="card" id="cardPhotos">
   <div class="card-head">
     <div class="card-num">1</div>
@@ -666,7 +546,6 @@
   <div class="photo-list" id="photoList"></div>
 </div>
 
-<!-- Stap 2: Logo -->
 <div class="card locked" id="cardLogo">
   <div class="card-head">
     <div class="card-num">2</div>
@@ -693,7 +572,6 @@
   </div>
 </div>
 
-<!-- Stap 3: Instellingen -->
 <div class="card locked" id="cardSettings">
   <div class="card-head">
     <div class="card-num">3</div>
@@ -728,7 +606,6 @@
   </div>
 </div>
 
-<!-- Stap 4: Resultaat -->
 <div class="card locked" id="cardResult">
   <div class="card-head">
     <div class="card-num">4</div>
@@ -746,6 +623,13 @@
   </div>
 </div>
 
+<div class="action-bar" id="actionBar">
+  <div class="action-bar-inner">
+    <button class="btn btn-secondary" id="resetBtn" data-i18n="result_reset"></button>
+    <button class="btn btn-primary" id="downloadZipBtn" data-i18n="result_download"></button>
+  </div>
+</div>
+
 <div class="status" id="status"></div>
 
 <div class="notice">
@@ -758,14 +642,6 @@
   <a href="https://github.com/keyzerphotos/OpenWatermark">GitHub</a><br>
   <span data-i18n="footer_privacy"></span>
 </footer>
-
-<!-- Vaste actiebalk onderaan -->
-<div class="action-bar" id="actionBar">
-  <div class="action-bar-inner">
-    <button class="btn btn-secondary" id="resetBtn" data-i18n="result_reset"></button>
-    <button class="btn btn-primary" id="downloadZipBtn" data-i18n="result_download"></button>
-  </div>
-</div>
 
 <script src="invisible-watermark.js"></script>
 <script src="app.js"></script>
