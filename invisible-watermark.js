@@ -1,10 +1,22 @@
 /* OpenWatermark - Onzichtbaar watermerk (DCT)
- * Versie 1.1.0 - MIT-licentie
+ * Versie 2.0.0 - MIT-licentie
  *
- * Verbetert t.o.v. 1.0.0:
- *  - Wiskundig correcte IDCT (geen beeldverandering meer)
- *  - Robuustere verificatie
- *  - Duidelijke statusmelding voor de UI
+ * Verbetert t.o.v. 1.1.0:
+ *  - Sleutelgebonden: de payload wordt ondertekend met HMAC-SHA-256 en een
+ *    geheime sleutel van de gebruiker. Zonder die sleutel kan niemand het
+ *    watermerk namaken of gericht overschrijven.
+ *  - 128 bits payload-handtekening (was: afgeknotte 64-bit SHA-256-hash).
+ *  - De blokvolgorde wordt afgeleid uit sleutel + payload (was: vaste,
+ *    publieke seed 987654321 voor iedereen).
+ *  - embed() werkt direct op een canvas en codeert maar één keer, met de
+ *    door de aanroeper gekozen JPEG-kwaliteit (was: altijd een extra
+ *    volledige JPEG-encode op 0,95 achteraf).
+ *  - verifyLegacy() controleert foto's die nog met versie 1.x zijn gemaakt.
+ *
+ * Eerlijke grens: dit blijft een extra laag, geen slot. Wie de afbeelding
+ * zwaar bewerkt, verkleint of bijsnijdt, kan de laag nog steeds breken.
+ * Wat versie 2 wél wegneemt, is stille vervalsing: een watermerk met jouw
+ * code erop kan alleen ontstaan met jouw geheime sleutel.
  */
 
 (function () {
@@ -15,7 +27,12 @@
   const COEFFS = [20, 21, 22, 27, 28, 29, 34, 35, 36];
   const STRENGTH = 12.0;
   const REDUNDANCY = 3;
-  const SEED = 987654321;
+
+  // v2: 16 bytes HMAC-handtekening = 128 bits
+  const SIGNATURE_BYTES = 16;
+  // v1 (legacy): vaste seed en 8 bytes SHA-256 = 64 bits
+  const LEGACY_SEED = 987654321;
+  const LEGACY_BYTES = 8;
 
   // ---------- DCT (correcte orthogonale variant) ----------
   // Voor 1D DCT-II: X[k] = c(k)/2 * sum_n x[n] * cos((2n+1)k*pi/16)
@@ -87,25 +104,50 @@
     return idctRes;
   }
 
-  // ---------- Payload → bits ----------
-  async function payloadToBits(payload) {
-    const data = new TextEncoder().encode(payload);
-    const buf = await crypto.subtle.digest('SHA-256', data);
-    const hash = new Uint8Array(buf);
-    const bits = new Uint8Array(64);
-    for (let i = 0; i < 8; i++) {
+  // ---------- Sleutel, handtekening en blokvolgorde ----------
+  function bytesToBits(bytes, count) {
+    const bits = new Uint8Array(count * 8);
+    for (let i = 0; i < count; i++) {
       for (let b = 0; b < 8; b++) {
-        bits[i * 8 + b] = (hash[i] >> (7 - b)) & 1;
+        bits[i * 8 + b] = (bytes[i] >> (7 - b)) & 1;
       }
     }
     return bits;
   }
 
-  // ---------- Blockvolgorde ----------
-  function shuffledIndices(total) {
+  async function hmac(secret, message) {
+    const enc = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+    );
+    const sig = await crypto.subtle.sign('HMAC', key, enc.encode(message));
+    return new Uint8Array(sig);
+  }
+
+  // v2-handtekening: HMAC-SHA-256(sleutel, domein + payload), eerste 16 bytes.
+  async function signatureBits(payload, secret) {
+    const sig = await hmac(secret, 'OpenWatermark-v2:' + payload);
+    return bytesToBits(sig, SIGNATURE_BYTES);
+  }
+
+  // v2-blokvolgorde: seed uit een aparte HMAC over sleutel + payload,
+  // zodat de posities per gebruiker en per code verschillen.
+  async function signatureSeed(payload, secret) {
+    const seedBytes = await hmac(secret, 'OpenWatermark-v2-volgorde:' + payload);
+    return ((seedBytes[0] << 24) | (seedBytes[1] << 16) | (seedBytes[2] << 8) | seedBytes[3]) >>> 0;
+  }
+
+  // v1 (legacy): kale SHA-256 van de payload, eerste 8 bytes.
+  async function legacyBits(payload) {
+    const data = new TextEncoder().encode(payload);
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    return bytesToBits(new Uint8Array(buf), LEGACY_BYTES);
+  }
+
+  function shuffledIndices(total, seed) {
     const arr = new Uint32Array(total);
     for (let i = 0; i < total; i++) arr[i] = i;
-    let s = SEED;
+    let s = seed >>> 0;
     const rnd = () => {
       s = (s * 1664525 + 1013904223) >>> 0;
       return s / 0xffffffff;
@@ -117,6 +159,7 @@
     return arr;
   }
 
+  // ---------- Blokken lezen/schrijven ----------
   function readBlockLuma(data, width, blockCol, blockRow) {
     const block = new Float32Array(64);
     const ox = blockCol * 8;
@@ -149,29 +192,23 @@
     }
   }
 
-  // ---------- Embed ----------
-  async function embed(source, payload) {
+  // Haal een bewerkbaar canvas + ImageData op uit een <img> of <canvas>.
+  // Een meegegeven canvas wordt in-place bewerkt: geen extra decode/encode.
+  function getWorkingCanvas(source) {
+    if (typeof HTMLCanvasElement !== 'undefined' && source instanceof HTMLCanvasElement) {
+      const ctx = source.getContext('2d', { willReadFrequently: true });
+      return { canvas: source, ctx, own: false };
+    }
     const canvas = document.createElement('canvas');
     canvas.width = source.naturalWidth || source.width;
     canvas.height = source.naturalHeight || source.height;
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     ctx.drawImage(source, 0, 0);
+    return { canvas, ctx, own: true };
+  }
 
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-
-    const cols = Math.floor(canvas.width / BLOCK);
-    const rows = Math.floor(canvas.height / BLOCK);
-    const totalBlocks = cols * rows;
-
-    const bits = await payloadToBits(payload);
-    const order = shuffledIndices(totalBlocks);
-    const blocksNeeded = bits.length * REDUNDANCY;
-
-    if (blocksNeeded > totalBlocks) {
-      throw new Error('Afbeelding is te klein voor een robuust watermerk (minimaal ~128×128 px).');
-    }
-
+  function embedBits(data, width, height, bits, order) {
+    const cols = Math.floor(width / BLOCK);
     for (let bitIdx = 0; bitIdx < bits.length; bitIdx++) {
       const bit = bits[bitIdx];
       for (let r = 0; r < REDUNDANCY; r++) {
@@ -179,10 +216,10 @@
         const blockCol = blockNum % cols;
         const blockRow = (blockNum - blockCol) / cols;
 
-        const luma = readBlockLuma(data, canvas.width, blockCol, blockRow);
+        const luma = readBlockLuma(data, width, blockCol, blockRow);
         const dctBlock = dct2d(luma);
 
-        // Versterk dezelfde coëfficiënten in alle posities
+        // Zet dezelfde coëfficiënten in alle posities op hetzelfde teken
         for (let ci = 0; ci < COEFFS.length; ci++) {
           const idx = COEFFS[ci];
           const current = dctBlock[idx];
@@ -194,35 +231,13 @@
         }
 
         const idctBlock = idct2d(dctBlock);
-        writeBlockLuma(data, canvas.width, blockCol, blockRow, luma, idctBlock);
+        writeBlockLuma(data, width, blockCol, blockRow, luma, idctBlock);
       }
     }
-
-    ctx.putImageData(imageData, 0, 0);
-    return new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.95));
   }
 
-  // ---------- Verify ----------
-  async function verify(source, payload) {
-    const canvas = document.createElement('canvas');
-    canvas.width = source.naturalWidth || source.width;
-    canvas.height = source.naturalHeight || source.height;
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    ctx.drawImage(source, 0, 0);
-
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-
-    const cols = Math.floor(canvas.width / BLOCK);
-    const rows = Math.floor(canvas.height / BLOCK);
-    const totalBlocks = cols * rows;
-
-    const expected = await payloadToBits(payload);
-    const order = shuffledIndices(totalBlocks);
-    const blocksNeeded = expected.length * REDUNDANCY;
-
-    if (blocksNeeded > totalBlocks) return { match: false, confidence: 0 };
-
+  function extractConfidence(data, width, height, expected, order) {
+    const cols = Math.floor(width / BLOCK);
     let matches = 0;
     for (let bitIdx = 0; bitIdx < expected.length; bitIdx++) {
       let votes = 0;
@@ -230,10 +245,9 @@
         const blockNum = order[bitIdx * REDUNDANCY + r];
         const blockCol = blockNum % cols;
         const blockRow = (blockNum - blockCol) / cols;
-        const luma = readBlockLuma(data, canvas.width, blockCol, blockRow);
+        const luma = readBlockLuma(data, width, blockCol, blockRow);
         const dctBlock = dct2d(luma);
 
-        // Stem op basis van som van alle COEFFS
         let posSum = 0, negSum = 0;
         for (let ci = 0; ci < COEFFS.length; ci++) {
           const v = dctBlock[COEFFS[ci]];
@@ -244,10 +258,86 @@
       const extracted = votes > REDUNDANCY / 2 ? 1 : 0;
       if (extracted === expected[bitIdx]) matches++;
     }
-    const confidence = matches / expected.length;
-    return { match: confidence > 0.75, confidence };
+    return matches / expected.length;
+  }
+
+  function assertUsable(payload, secret) {
+    if (!payload || !String(payload).trim()) {
+      throw new Error('Verificatiecode is leeg.');
+    }
+    if (!secret || !String(secret).trim()) {
+      throw new Error('Geheime sleutel ontbreekt. Zonder sleutel kan er geen ondertekend watermerk worden ingebed.');
+    }
+  }
+
+  // ---------- Embed ----------
+  // source: <img> of <canvas>. Een canvas wordt in-place bewerkt en daarna
+  // één keer geëncodeerd met de opgegeven kwaliteit (standaard 0,92).
+  async function embed(source, payload, secret, quality) {
+    assertUsable(payload, secret);
+    const q = typeof quality === 'number' ? quality : 0.92;
+
+    const { canvas, ctx } = getWorkingCanvas(source);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    const cols = Math.floor(canvas.width / BLOCK);
+    const rows = Math.floor(canvas.height / BLOCK);
+    const totalBlocks = cols * rows;
+
+    const bits = await signatureBits(payload, secret);
+    const blocksNeeded = bits.length * REDUNDANCY;
+    if (blocksNeeded > totalBlocks) {
+      throw new Error('Afbeelding is te klein voor een robuust watermerk (minimaal ~160×160 px).');
+    }
+
+    const order = shuffledIndices(totalBlocks, await signatureSeed(payload, secret));
+    embedBits(imageData.data, canvas.width, canvas.height, bits, order);
+
+    ctx.putImageData(imageData, 0, 0);
+    return new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', q));
+  }
+
+  // ---------- Verify (v2) ----------
+  async function verify(source, payload, secret) {
+    assertUsable(payload, secret);
+    const { canvas, ctx } = getWorkingCanvas(source);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    const cols = Math.floor(canvas.width / BLOCK);
+    const rows = Math.floor(canvas.height / BLOCK);
+    const totalBlocks = cols * rows;
+
+    const expected = await signatureBits(payload, secret);
+    if (expected.length * REDUNDANCY > totalBlocks) return { match: false, confidence: 0, legacy: false };
+
+    const order = shuffledIndices(totalBlocks, await signatureSeed(payload, secret));
+    const confidence = extractConfidence(imageData.data, canvas.width, canvas.height, expected, order);
+    return { match: confidence > 0.75, confidence, legacy: false };
+  }
+
+  // ---------- Verify (legacy v1, alleen lezen) ----------
+  // Voor foto's die met OpenWatermark 1.x / app 2.4.0 of eerder zijn gemaakt:
+  // vaste seed, kale SHA-256, 64 bits. Zwakker, maar zo blijven oude foto's
+  // controleerbaar.
+  async function verifyLegacy(source, payload) {
+    if (!payload || !String(payload).trim()) {
+      throw new Error('Verificatiecode is leeg.');
+    }
+    const { canvas, ctx } = getWorkingCanvas(source);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    const cols = Math.floor(canvas.width / BLOCK);
+    const rows = Math.floor(canvas.height / BLOCK);
+    const totalBlocks = cols * rows;
+
+    const expected = await legacyBits(payload);
+    if (expected.length * REDUNDANCY > totalBlocks) return { match: false, confidence: 0, legacy: true };
+
+    const order = shuffledIndices(totalBlocks, LEGACY_SEED);
+    const confidence = extractConfidence(imageData.data, canvas.width, canvas.height, expected, order);
+    return { match: confidence > 0.75, confidence, legacy: true };
   }
 
   // ---------- Publieke API ----------
-  window.OpenWatermarkInvisible = { embed, verify, version: '1.1.0' };
+  window.OpenWatermarkInvisible = { embed, verify, verifyLegacy, version: '2.0.0' };
 })();
