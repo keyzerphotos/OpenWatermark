@@ -309,6 +309,21 @@
   }
   .alert.visible { display: block; }
 
+  .verify-result {
+    display: none; margin-top: 10px; padding: 9px 11px;
+    border-radius: var(--radius-sm); font-size: 0.68rem; line-height: 1.55;
+    border: 1px solid var(--border); color: var(--text-dim); background: var(--bg-2);
+  }
+  .verify-result.visible { display: block; }
+  .verify-result.success { border-color: rgba(51, 168, 82, 0.45); color: var(--success); }
+  .verify-result.error { border-color: rgba(215, 55, 63, 0.45); color: var(--danger); }
+  .verify-result.warning { border-color: rgba(230, 134, 25, 0.4); color: var(--warning); }
+  .verify-file {
+    display: none; margin-top: 8px; font-size: 0.68rem; color: var(--text-dim);
+    padding: 5px 7px; background: var(--bg-2); border-radius: 3px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
   .counter-box {
     display: none; margin-top: 20px; text-align: center; font-size: 0.66rem;
     color: var(--text-muted); line-height: 1.5; padding-bottom: 12px; border-bottom: 1px solid var(--border);
@@ -539,6 +554,15 @@
         <div class="field-details-body" data-i18n-html="set_payload_explanation"></div>
       </details>
     </div>
+
+    <div class="slider-row" style="flex-wrap: wrap;">
+      <label data-i18n="set_secret"></label>
+      <div style="display:flex; gap:4px; flex:1; min-width:0;">
+        <input type="password" id="secretInput" class="text-input" autocomplete="off" spellcheck="false" style="flex:1;">
+        <button type="button" class="btn btn-secondary btn-small" id="secretNewBtn" data-i18n="set_secret_new"></button>
+      </div>
+      <div class="field-hint" style="flex-basis:100%;" data-i18n="set_secret_hint"></div>
+    </div>
   </div>
 
   <div class="card locked" id="cardResult">
@@ -557,6 +581,33 @@
     <div class="progress-bar" id="progressBar">
       <div class="progress-fill" id="progressFill"></div>
     </div>
+  </div>
+
+  <div class="card" id="cardVerify">
+    <div class="card-head">
+      <div class="card-num">✓</div>
+      <div>
+        <div class="card-title" data-i18n="verify_title"></div>
+        <div class="card-hint" data-i18n="verify_hint"></div>
+      </div>
+    </div>
+    <div class="drop-zone" id="verifyZone">
+      <div class="drop-icon">🔍</div>
+      <div class="drop-label" data-i18n="verify_drop"></div>
+      <div class="drop-hint" data-i18n="verify_hint_card"></div>
+      <input type="file" id="verifyInput" accept="image/*" hidden>
+    </div>
+    <div class="verify-file" id="verifyFileName"></div>
+    <div class="slider-row">
+      <label data-i18n="verify_code_label"></label>
+      <input type="text" id="verifyPayload" class="text-input" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="slider-row">
+      <label data-i18n="verify_secret_label"></label>
+      <input type="password" id="verifySecret" class="text-input" autocomplete="off" spellcheck="false">
+    </div>
+    <button class="btn btn-primary" id="verifyBtn" data-i18n="verify_button" style="margin-top: 10px;"></button>
+    <div class="verify-result" id="verifyResult"></div>
   </div>
 
   <div class="action-bar" id="actionBar">
@@ -588,8 +639,8 @@
 
 </div>
 
-<script src="invisible-watermark.js?v=1.1.0"></script>
-<script src="app.js?v=2.4.0"></script>
+<script src="invisible-watermark.js?v=2.0.0"></script>
+<script src="app.js?v=2.5.0"></script>
 
 </body>
 </html>
